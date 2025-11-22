@@ -1,32 +1,29 @@
 const express = require('express');
-const app = express();
-const port = 3000; // Porta padrão da API
-
-// --- Importação das Rotas ---
-// (Importamos os arquivos da pasta /src/routes)
+const cookieParser = require('cookie-parser');
+require('dotenv').config();
+const path = require('path'); // Módulo nativo do Node.js para lidar com caminhos de arquivos
 const authRoutes = require('./src/routes/authRoutes');
-const { produtoRoutes: orcamentoRoutes } = require('./src/routes/orcamentoRoutes');
+const app = express();
+const PORT = process.env.PORT; // Porta onde o servidor vai rodar
 
 // --- Middlewares Essenciais ---
-// Habilita o Express para entender JSON no corpo das requisições
 app.use(express.json());
 
-// --- Definição das Rotas ---
 
-// Rota "raiz" (teste)
-app.get('/', (req, res) => {
-  res.send('API da Marcenaria no ar!');
+
+// Rota raiz da API (opcional, pois o index.html já vai carregar na raiz)
+// Se você acessar http://localhost:3000/api, verá essa mensagem.
+app.get('/api', (req, res) => {
+  res.send('API da Marcenaria no ar! (Acesse a raiz para ver o Front-end)');
 });
 
-// Rotas de Autenticação (ex: /login)
+// Rotas de Autenticação (ex: /login, /registrar)
+// Se usar app.use('/auth', authRoutes), a rota vira /auth/login.
+// Se usar app.use('/', authRoutes), a rota vira /login (mais simples para este MVP).
 app.use('/', authRoutes);
-
-// Rotas de Orçamentos (ex: /orcamentos)
-app.use('/', orcamentoRoutes);
 
 
 // --- Inicialização do Servidor ---
-// O servidor "ouve" na porta definida
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+app.listen(PORT,()=>{
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
