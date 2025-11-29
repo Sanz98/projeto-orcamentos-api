@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const path = require('path'); // Módulo nativo do Node.js para lidar com caminhos de arquivos
 const authRoutes = require('./src/routes/authRoutes');
+const orcamentoRoutes = require('./src/routes/orcamentoRoutes');
 const app = express();
 const PORT = process.env.PORT; // Porta onde o servidor vai rodar
 
@@ -21,6 +22,7 @@ app.get('/api', (req, res) => {
 // Se usar app.use('/auth', authRoutes), a rota vira /auth/login.
 // Se usar app.use('/', authRoutes), a rota vira /login (mais simples para este MVP).
 app.use('/', authRoutes);
+app.use('/', orcamentoRoutes);
 
 
 // --- Inicialização do Servidor ---

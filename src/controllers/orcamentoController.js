@@ -20,7 +20,7 @@ const orcamentoController = {
 
     criarOrcamento: async (req, res) => {
         try {
-            const { nomeCliente, telefoneCliente, valorTotal } = req.body
+            const { nomeCliente, telefoneCliente, valorTotal, idVendedor } = req.body
 
             if (nomeCliente == undefined || telefoneCliente == undefined || isNaN(valorTotal)) {
                 return res.status(400).json({
@@ -28,7 +28,7 @@ const orcamentoController = {
                 })
             }
 
-            await orcamentoModel.criarOrcamento(nomeCliente, telefoneCliente, valorTotal)
+            await orcamentoModel.criarOrcamento(nomeCliente, telefoneCliente, valorTotal, idVendedor)
 
             res.status(201).json({
                 message: 'orçamento criado  com sucesso!'
@@ -66,7 +66,7 @@ const orcamentoController = {
             }
 
             // Se passou por tudo, atualiza
-            await orcamentoModel.atualizar(id, { status, valorTotal });
+            await orcamentoModel.atualizarOrcamento(id, { status, valorTotal });
             res.status(200).json({ message: 'Orçamento atualizado com sucesso!' });
 
         } catch (error) {
@@ -78,6 +78,4 @@ const orcamentoController = {
 
 
 
-module.exports = {
-    orcamentoController
-};
+module.exports = {orcamentoController};
