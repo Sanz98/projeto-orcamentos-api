@@ -86,7 +86,7 @@ const usuarioModel = {
      * @returns {Promise<void>} Não retorna valor, apenas completa a operação ou lança um erro.
      * @throws {Error} Propaga o erro caso a inserção falhe.
      */
-    inserir: async (nome, email, senhaHash, perfil) => {
+    inserirUsuario: async (nome, email, senhaHash, perfil) => {
         try {
 
             const pool = await getConnection();
