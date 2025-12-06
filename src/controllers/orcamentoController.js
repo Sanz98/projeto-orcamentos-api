@@ -2,17 +2,31 @@ const { orcamentoModel } = require("../models/orcamentoModel")
 
 const orcamentoController = {
   
-    listarOrcamento: async (req, res) =>{
-        try {
 
-            const orcamento = await orcamentoModel.buscarTodos();
-            res.status(200).json(orcamento);
+    listarOrcamento: async (req, res) => {
+
+        try {
+            // 1. Recuperamos os dados que o Middleware 'autenticado' salvou
+            const { idUsuario, perfil } = req.usuario;
+
+            let orcamentos;
+
+            // 2. Lógica de Decisão (Item 4.1.3 da grade)
+            if (perfil === 'gerente') {
+                // Se for gerente, busca TUDO
+                orcamentos = await orcamentoModel.buscarTodos();
+            } else {
+                // Se for vendedor, busca SÓ OS DELE usando o idUsuario
+                orcamentos = await orcamentoModel.buscarPorVendedor(idUsuario);
+            }
+
+            // 3. Retorna o resultado (que pode ser tudo ou filtrado)
+            return res.status(200).json(orcamentos);
             
-        } catch (error) {
-            console.error('Erro ao listar orcamentos:',error);
-            res.status(500).json({error: 'Erro ao buscar Orcamento'})
-            
-        }
+            } catch (error) {
+                console.error('Erro ao listar orcamentos:', error);
+                res.status(500).json({ error: 'Erro ao buscar Orçamento' });
+            }
     },
 
     //Função criar orçamentos 

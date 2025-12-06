@@ -16,6 +16,7 @@ const usuarioController = {
     },
 
     criarVendedor: async (req, res) => {
+      
         try {
             const { nome, email, senha } = req.body;
             const perfilFixo = 'vendedor';
@@ -35,7 +36,7 @@ const usuarioController = {
                 return res.status(409).json({ erro: 'Este e-mail já está cadastrado.' });
             }
 
-            // ---  CONTINUA O PROCESSO NORMAL ---
+            
             const senhaHash = await bcrypt.hash(senha, 10);
 
             await usuarioModel.inserir(nome, email, senhaHash, perfilFixo);
