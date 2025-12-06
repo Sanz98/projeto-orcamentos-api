@@ -67,7 +67,6 @@ const orcamentoModel = {
                 .input('idVendedor', sql.UniqueIdentifier, idVendedor)
                 .query(querySQL) // passando a query para executar o comando 
 
-                
 
 
         } catch (error) {

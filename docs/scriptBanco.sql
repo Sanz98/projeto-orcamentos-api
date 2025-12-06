@@ -1,6 +1,10 @@
 USE dbMarcenaria;
 GO
 
+DROP TABLE IF EXISTS itensOrcamento;
+DROP TABLE IF EXISTS orcamentos;
+DROP TABLE IF EXISTS clientes;
+DROP TABLE IF EXISTS usuarios;
 -- 1. Tabela de Usuários (Mantive sua lógica, está ótima)
 CREATE TABLE usuarios (
     idUsuario UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
@@ -12,14 +16,19 @@ CREATE TABLE usuarios (
 GO
 
 
+CREATE TABLE clientes(
+    idCliente UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    nomeCliente VARCHAR(100) NOT NULL,
+    telefoneCliente CHAR(12)
+);
+GO
+
 -- 2. Tabela de Orçamentos (O "Cabeçalho" do PDF)
 CREATE TABLE orcamentos (
     idOrcamento UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
     
-    -- Dados do Cliente
-    nomeCliente VARCHAR(100) NOT NULL,
-    telefoneCliente VARCHAR(25),
-    
+    idCliente UNIQUEIDENTIFIER NOT NULL,
+
     -- Status
     status VARCHAR(20) DEFAULT 'Em Analise' CHECK (status IN ('Em Analise', 'Aprovado', 'Rejeitado')),
     dataCriacao DATETIME DEFAULT GETDATE(),
@@ -40,9 +49,10 @@ CREATE TABLE orcamentos (
     
     -- Relacionamentos
     validadeDias INT DEFAULT 7,
-    observacoes VARCHAR(MAX),
+    observacoes VARCHAR(200),
     idVendedor UNIQUEIDENTIFIER NOT NULL,
-    FOREIGN KEY (idVendedor) REFERENCES usuarios(idUsuario)
+    FOREIGN KEY (idVendedor) REFERENCES usuarios(idUsuario),
+    FOREIGN KEY (idCliente) REFERENCES clientes(idCliente)
 );
 GO
 
@@ -55,13 +65,13 @@ CREATE TABLE itensOrcamento (
     
     -- Descrição Técnica Detalhada (Mudamos para VARCHAR(MAX) para caber tudo)
     -- Aqui vai: "SENDO ELE COM 4 GAVETAS... MATERIAIS... COR INTERNA..."
-    descricaoDetalhada VARCHAR(MAX) NOT NULL, 
+    descricaoDetalhada VARCHAR(200) NOT NULL, 
     
     valorUnitario DECIMAL(10, 2) NOT NULL, --  Ex: 3540.00
     quantidade INT DEFAULT 1, -- 
     
     -- Relacionamento: Este item pertence a qual orçamento?
     idOrcamento UNIQUEIDENTIFIER NOT NULL,
-    FOREIGN KEY (idOrcamento) REFERENCES orcamentos(idOrcamento) ON DELETE CASCADE
+    FOREIGN KEY (idOrcamento) REFERENCES orcamentos(idOrcamento)
 );
 GO
