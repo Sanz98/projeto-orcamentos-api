@@ -2,7 +2,9 @@ const { orcamentoModel } = require("../models/orcamentoModel")
 
 const orcamentoController = {
   
+
     listarOrcamento: async (req, res) => {
+
         try {
             // 1. Recuperamos os dados que o Middleware 'autenticado' salvou
             const { idUsuario, perfil } = req.usuario;
@@ -87,7 +89,5 @@ const orcamentoController = {
         }
     }
 };
-
-
 
 module.exports = {orcamentoController};

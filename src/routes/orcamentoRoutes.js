@@ -18,5 +18,8 @@ router.get('/orcamentos', verify.autenticado, orcamentoController.listarOrcament
 router.post('/orcamentos', verify.autenticado, orcamentoController.criarOrcamento);
 router.put('/orcamentos/:id', verify.autenticado, orcamentoController.atualizarOrcamento);
 
-module.exports = router;
+
+// Rota Delete para deletar orcamento 
+
+module.exports =  router;
 
