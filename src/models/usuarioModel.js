@@ -22,6 +22,25 @@ const { sql, getConnection } = require('../config/db');
  */
 const usuarioModel = {
 
+    buscarUm: async (idUsuario) => {
+        try {
+            
+            const pool = await getConnection();
+
+            const querySQL = 'SELECT * FROM usuarios WHERE idUsuario = @idUsuario';
+            const result = await pool.request()
+                .input('idUsuario', sql.UniqueIdentifier, idUsuario)
+                .query(querySQL);
+
+            return result.recordset
+
+        } catch (error) {
+            console.error('Erro ao buscar o usuario:', error);
+            throw error; // Reverbera o erro
+        }
+        
+    },
+
     /**
      * Modelo que busca todos os usuarios no banco de dados.
      * * @async
@@ -86,7 +105,7 @@ const usuarioModel = {
      * @returns {Promise<void>} Não retorna valor, apenas completa a operação ou lança um erro.
      * @throws {Error} Propaga o erro caso a inserção falhe.
      */
-    inserir: async (nome, email, senhaHash, perfil) => {
+    inserirUsuario: async (nome, email, senhaHash, perfil) => {
         try {
 
             const pool = await getConnection();
@@ -105,7 +124,31 @@ const usuarioModel = {
             throw error;
 
         }
-    }
+    },
+
+    atualizarUsuario: async (idUsuario, nome, email) => {
+        
+        try {
+            const pool = await getConnection();
+
+            // Evitar SQL Injection
+            const querySQL = `
+                UPDATE usuarios
+                SET nome = @nome,
+                    email = @email
+                WHERE idUsuario = @idUsuario
+            `
+            await pool.request()
+                .input('nome', sql.VarChar(100), nome)
+                .input('email', sql.VarChar(100), email)
+                .input('idUsuario', sql.UniqueIdentifier, idUsuario)
+                .query(querySQL);
+        } catch (error) {
+            console.error('Erro ao atualizar usuario:', error);
+            throw error;
+        }
+
+    },
 };
 
 

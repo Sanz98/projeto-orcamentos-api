@@ -1,109 +1,72 @@
 const {usuarioModel} = require("../models/usuarioModel");
 const bcrypt = require('bcrypt');
 
-
-    /*
-    -----------------------
-    LISTAR TODOS CLIENTES
-    GET /clientes
-    -----------------------
-    */
-
 const usuarioController ={
     
     listarVendores: async (req, res)=>{
         try {
-            const clientes = await usuarioModel.buscarTodos();
-            res.status(200).json(clientes);
+            const vendedores = await usuarioModel.buscarTodos();
+            res.status(200).json(vendedores);
         } catch (error) {
-            console.error('Erro ao listar clientes:', error);
-            res.status(500).json({error: 'Error ao buscar clientes'});
+            console.error('Erro ao listar vendedores:', error);
+            res.status(500).json({error: 'Error ao buscar vendedores'});
             
         }
 
     },
 
-    /*
-    -----------------------
-    CRIAR UM NOVO CLIENTE
-    POST /cliente
-    BODY:
-    {
-        "nomeCliente": "nome",
-        "cpfCliente": "000.000.000-00"
-    }
-    -----------------------
-    */
+    criarVendedor: async (req, res) => {
+            const { nome, email, senha } = req.body;
+            const perfilFixo = 'vendedor'; // <<< FORÇA O PERFIL
+            
+            try {
+                // ... (Validações)
+                const senhaHash = await bcrypt.hash(senha, 10);
 
-    criarCliente: async (req, res)=>{
+                // Chama o Model para salvar, garantindo que o perfil seja 'vendedor'
+                await usuarioModel.inserirUsuario(nome, email, senhaHash, perfilFixo);
+
+                return res.status(201).json({ mensagem: 'Vendedor cadastrado com sucesso!', perfil: perfilFixo });
+
+            } catch (error) {
+                // ... (Tratamento de erros de banco de dados, 500)
+                console.error('Erro ao criar vendedor:', error);
+                return res.status(500).json({ erro: 'Não foi possível cadastrar o vendedor.' }); 
+            }
+    },
+
+    atualizarUsuario: async (req, res) => {
         try {
+            const {idUsuario} = req.params;
+            const {nome, email} = req.body;
 
-           const {nomeCliente, cpfCliente, emailCliente, senhaCliente} = req.body;
-           
-           if (nomeCliente == undefined || cpfCliente == undefined || emailCliente == undefined || senhaCliente == undefined) {
-                return res.status(400).json({erro: 'Campos obrigatorios não preenchidos!'});
-           }
-
-           
-           const clientes = await clienteModel.buscarPorCPF(cpfCliente);
-           
-           if (clientes.length > 0 ) {
-               return res.status(409).json({erro: 'CPF já cadastrado!'})
-            }
-            
-            const saltRounds = 10;
- 
-            const senhaHash = bcrypt.hashSync(senhaCliente, saltRounds);
-
-           await clienteModel.inserirCliente(nomeCliente, cpfCliente, emailCliente, senhaHash);
-
-           res.status(201).json({message: 'Cliente cadastrado com sucesso!'});
-            
-        } catch (error) {
-            console.error('Erro ao cadastrar cliente:', error);
-            res.status(500).json({erro: 'Erro ao cadatrar cliente.'});
-        }
-    }
-    
-}
-
-module.exports={usuarioController};
-
-
-
-
-/* registrarUsuario: async (req, res) => {
-        try {
-            const { nome, email, senha, perfil } = req.body;
-
-            // Validação
-            if (!nome || !email || !senha || !perfil) {
-                return res.status(400).json({ erro: 'Todos os campos são obrigatórios' });
+            // Validação de UUID.
+            if (idUsuario.length != 36) {
+                return res.status(400).json({erro: 'id do usuario inválido!'});
             }
 
-            if (perfil !== 'vendedor' && perfil !== 'gerente') {
-                return res.status(400).json({ erro: 'Perfil inválido. Use "vendedor" ou "gerente".' });
+            const usuario = await usuarioModel.buscarUm(idUsuario)
+
+            // Validação de o Produto existe.
+            if (!usuario || usuario.length !== 1) {
+                return res.status(404).json({erro: 'Usuario não encontrado!'});
             }
 
-            const usuarioExistente = await usuarioModel.buscarPorEmail(email);
+            const usuarioAtual = produto[0];
 
-            if (usuarioExistente) {
-                return res.status(409).json({ erro: 'E-mail já cadastrado.' });
-            }
+            const nomeAtualizado = nome ?? usuarioAtual.nome;
+            const emailAtualizado = email ?? usuarioAtual.email;
 
-            
-            // Criptografia
-            const salt = await bcrypt.genSalt(10);
-            const senhaHash = await bcrypt.hash(senha, salt);
-
-            // Salvar no banco
-            await usuarioModel.inserir(nome, email, senhaHash, perfil);
-
-            res.status(201).json({ message: 'Usuário criado com sucesso!' });
+            await produtoModel.atualizarProdutos(idProduto, nomeAtualizado, precoAtualizado);
+            res.status(200).json({message: 'Produto atualizado com sucesso!'});
 
         } catch (error) {
-            console.error('Erro ao registrar usuário:', error);
-            res.status(500).json({ erro: 'Erro interno ao registrar usuário.' });
+            console.error('Erro ao atualizar produto:', error);
+            res.status(500).json({erro: 'Erro interno no servidor ao atualizar produto.'});
         }
         
-    }, */
+    },
+    
+};
+
+module.exports={usuarioController};

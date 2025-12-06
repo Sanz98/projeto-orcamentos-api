@@ -28,15 +28,15 @@ const orcamentoModel = {
 
     },
 
-    buscarPorVendedor: async (idVendedor) => {
+    buscarPorVendedor: async (idUsuario) => {
         try {
             const pool = await getConnection();
 
-            let querySQL = "SELECT * FROM orcamentos WHERE idVendedor = @idVendedor"
+            let querySQL = "SELECT * FROM orcamentos WHERE idUsuario = @idUsuario"
 
             const result = await pool.request()
                 .input('idVendedor', sql.
-                    UniqueIdentifier, idVendedor)
+                    UniqueIdentifier, idUsuario)
                 .query(querySQL);
 
             return result.recordset;

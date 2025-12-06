@@ -3,72 +3,42 @@ schema_version: "5.1"
 name: Scratch Pad
 meta:
   id: wrk_scratchpad
-  created: 1757186468960
-  modified: 1757186468960
+  created: 1757879644788
+  modified: 1757879644788
   description: ""
 collection:
-  - name: Perfil
+  - name: Usuarios
     meta:
-      id: fld_499b68928d724f81a98cd74a53baea68
-      created: 1764425878518
-      modified: 1764425878518
-      sortKey: -1764425878519
+      id: fld_6ac718e338bb42a88a15a6bfbd6a10d0
+      created: 1764782758096
+      modified: 1764782758096
+      sortKey: -1764782758096
       description: ""
     children:
-      - url: localhost:8081/registrar
-        name: Registra Perfil
-        meta:
-          id: req_9b56458df307411083ef1b2b80e6c31a
-          created: 1764425881474
-          modified: 1764441661998
-          isPrivate: false
-          description: ""
-          sortKey: -1764425881474
-        method: POST
-        body:
-          mimeType: application/json
-          text: |-
-            { 
-            	"nome": "Jessica",
-            	"email": "Jessica@email.com",
-            	"senha": "123456789",
-            	"perfil": "vendedor" 
-            }
-        headers:
-          - name: Content-Type
-            value: application/json
-          - name: User-Agent
-            value: insomnia/12.0.0
-        settings:
-          renderRequestBody: true
-          encodeUrl: true
-          followRedirects: global
-          cookies:
-            send: true
-            store: true
-          rebuildPath: true
       - url: localhost:8081/login
-        name: Login Perfil
+        name: Login usuario
         meta:
-          id: req_89b98104dcd2418eb8e6e450e65969f1
-          created: 1764426697788
-          modified: 1764444618851
+          id: req_f2710c34126b4659b94e81d20d670a28
+          created: 1764782762062
+          modified: 1764783258035
           isPrivate: false
           description: ""
-          sortKey: -1763519145378
+          sortKey: -1764782762062
         method: POST
         body:
           mimeType: application/json
           text: |-
-            { 
-            	"email": "Thiago@email.com",
-            	"senha": "123456789"
+            {
+              "email": "admin@marcenaria.com",
+              "senha": "admin123"
             }
         headers:
           - name: Content-Type
             value: application/json
           - name: User-Agent
-            value: insomnia/12.0.0
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -77,23 +47,48 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: Orçamentos
-    meta:
-      id: fld_2a8f5d736b9f4d5fa0b70ea935e84569
-      created: 1764441388463
-      modified: 1764441388463
-      sortKey: -1764441388463
-      description: ""
-    children:
-      - url: localhost:8081/orcamentos
-        name: Listar orçamentos
+      - url: localhost:8081/registrar/vendedor
+        name: Criar usuario
         meta:
-          id: req_5518d4a2969f4f228ed14431754ac7ad
-          created: 1764441391782
-          modified: 1764441474365
+          id: req_1ff97d374ab545f08d8cb285c836880b
+          created: 1764782800098
+          modified: 1764783313101
           isPrivate: false
           description: ""
-          sortKey: -1764441391782
+          sortKey: -1764782800098
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "João",
+              "email": "joao@marcenaria.com",
+              "senha": "123456789"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:8081/vendedores
+        name: Listar usuarios
+        meta:
+          id: req_adb2bf4435834573b883eb97030be876
+          created: 1764782890325
+          modified: 1764784623001
+          isPrivate: false
+          description: ""
+          sortKey: -1764782890325
         method: GET
         headers:
           - name: User-Agent
@@ -108,28 +103,25 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "localhost:8081/orcamentos "
-        name: Criar orçamentos
+  - name: Orçamentos
+    meta:
+      id: fld_631985359fbe453183bfc01f9dde3891
+      created: 1764782854507
+      modified: 1764782854507
+      sortKey: -1764782854507
+      description: ""
+    children:
+      - url: ""
+        name: Listar orçamentos
         meta:
-          id: req_35d0cc49ffdf417d9947dd4493dfcfea
-          created: 1764442088922
-          modified: 1764444115821
+          id: req_cf7c3d1dd8334ec094d5bab984388a9a
+          created: 1764782857141
+          modified: 1764782879038
           isPrivate: false
           description: ""
-          sortKey: -1764442088922
-        method: POST
-        body:
-          mimeType: application/json
-          text: |-
-            {
-            	"nomeCliente":"Maycon",
-            	"telefoneCliente":"1999999999",
-            	"valorTotal": 1000,
-            	"idVendedor": "61423303-D049-48AF-9203-AF106D519EEE"
-            }
+          sortKey: -1764782857141
+        method: GET
         headers:
-          - name: Content-Type
-            value: application/json
           - name: User-Agent
             value: insomnia/12.1.0
             description: ""
@@ -142,26 +134,40 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: localhost:8081/orcamentos/297FB1BF-E108-493A-B2B0-45249751CCD9
-        name: Atualizar orçamentos
+      - url: ""
+        name: Criar orçamento
         meta:
-          id: req_7941611d00444ca3913f610c1d38f5db
-          created: 1764444417540
-          modified: 1764448530211
+          id: req_51fc8769251145eba84f02bdc74509ab
+          created: 1764782913019
+          modified: 1764782957955
           isPrivate: false
           description: ""
-          sortKey: -1764444417540
-        method: PUT
-        body:
-          mimeType: application/json
-          text: |-
-            {
-            	"status":"Aprovado",
-            	"valorTotal": 1500
-            }
+          sortKey: -1764782913019
+        method: POST
         headers:
-          - name: Content-Type
-            value: application/json
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: ""
+        name: Adicionar itensOrçamento
+        meta:
+          id: req_135f1a3eef8d4064bdddc36f726409d4
+          created: 1764782953510
+          modified: 1764783006731
+          isPrivate: false
+          description: ""
+          sortKey: -1764782953510
+        method: POST
+        headers:
           - name: User-Agent
             value: insomnia/12.1.0
             description: ""
@@ -178,12 +184,12 @@ cookieJar:
   name: Default Jar
   meta:
     id: jar_99d30891da4bdcebc63947a8fc17f076de878684
-    created: 1764425863427
-    modified: 1764444620907
+    created: 1764782118558
+    modified: 1764783262415
   cookies:
-    - id: 712e6f85-f082-4721-9c20-079a567c8935
+    - id: 0216ef7d-48d0-4a05-ac19-9449c3f0ad73
       key: token
-      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZFVzdWFyaW8iOiI2MTQyMzMwMy1EMDQ5LTQ4QUYtOTIwMy1BRjEwNkQ1MTlFRUUiLCJub21lIjoiVGhpYWdvIiwicGVyZmlsIjoidmVuZGVkb3IiLCJpYXQiOjE3NjQ0NDQ2MjAsImV4cCI6MTc2NDQ0ODIyMH0.Z_P6ERMGiwiRyLmKEcMNNwqY4u7NGG_IPXJ6hIKi03E
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZFVzdWFyaW8iOiIzOEFFNTE3OS1GOEQ3LTRBQzEtQkRGNS0wNkRGODUxRjBCMDMiLCJub21lIjoiR2VyZW50ZSBNYXN0ZXIiLCJwZXJmaWwiOiJnZXJlbnRlIiwiaWF0IjoxNzY0NzgzMjYyLCJleHAiOjE3NjQ3ODY4NjJ9.WnMDDFuIl1YAv7h2ZV-CQRfmdiOsXeSJfPTF5F8UaWI
       domain: localhost
       path: /
       secure: false
@@ -193,6 +199,6 @@ environments:
   name: Base Environment
   meta:
     id: env_99d30891da4bdcebc63947a8fc17f076de878684
-    created: 1764425863417
-    modified: 1764425863417
+    created: 1764782118554
+    modified: 1764782118554
     isPrivate: false

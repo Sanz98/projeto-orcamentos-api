@@ -1,38 +1,26 @@
-// Importa bibliotecas necessárias
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const {usuarioModel} = require('../models/usuarioModel');
-
-// Segredo do JWT (em produção, use .env)
-const JWT_SECRET = process.env.JWT_SECRET;
+const bcrypt = require('bcrypt');
+const { usuarioModel } = require('../models/usuarioModel'); 
 
 const authController = {
-    usuarioLogin: async (req, res) => {
+    login: async (req, res) => {
         try {
+
             const { email, senha } = req.body;
 
-            if (email == undefined || senha == undefined) {
-                return res.status(400).json({erro: 'Email e senha são obrigatorios!'});             
-            }
-
             const usuario = await usuarioModel.buscarPorEmail(email);
+            if (!usuario) return res.status(401).json({ erro: 'Email não encontrado' });
 
-            if (usuario.length == 0) {
-                return res.status(401).json({erro: 'Email não encontrado!'});
-            }
-
+            // Comparação da senha (Criptografia)
             const senhaValida = await bcrypt.compare(senha, usuario.senhaHash);
+            if (!senhaValida) return res.status(401).json({ erro: 'Credenciais inválidas.' });
 
-            if (!senhaValida) {
-                return res.status(401).json({erro: 'Credenciais inválidas'});
-            }
-
+            // Geração do Payload com o PERFIL
             const payload = {
                 idUsuario: usuario.idUsuario,
                 nome: usuario.nome,
                 perfil: usuario.perfil
             };
-
             const token = jwt.sign(payload, process.env.JWT_SECRET, {
                 expiresIn: process.env.JWT_EXPIRES_IN
             });
@@ -48,15 +36,11 @@ const authController = {
                 message: 'Logado com sucesso!', 
                 token
             });
+
         } catch (error) {
-            console.error('Erro no login do usuario:', error);
-            res.status(500).json({erro: 'Erro interno no servidor ao realizar login do usuario.'});
+            console.error('Erro no login:', error);
+            return res.status(500).json({ erro: 'Erro interno.' }); 
         }
-        
     }
-
 };
-
-module.exports = {authController};
-
-
+module.exports = { authController };
