@@ -38,7 +38,7 @@ const usuarioController = {
             // ---  CONTINUA O PROCESSO NORMAL ---
             const senhaHash = await bcrypt.hash(senha, 10);
 
-            await usuarioModel.inserirUsuario(nome, email, senhaHash, perfilFixo);
+            await usuarioModel.inserir(nome, email, senhaHash, perfilFixo);
 
             return res.status(201).json({
                 mensagem: 'Vendedor cadastrado com sucesso!',
@@ -51,7 +51,7 @@ const usuarioController = {
         }
     },
 
-    atualizarUsuario: async (req, res) => {
+    atualizarVendedor: async (req, res) => {
         try {
             const { idUsuario } = req.params;
             const { nome, email } = req.body;
@@ -68,20 +68,46 @@ const usuarioController = {
                 return res.status(404).json({ erro: 'Usuario não encontrado!' });
             }
 
-            const usuarioAtual = produto[0];
+            const usuarioAtual = usuario[0];
 
             const nomeAtualizado = nome ?? usuarioAtual.nome;
             const emailAtualizado = email ?? usuarioAtual.email;
 
-            await produtoModel.atualizarProdutos(idProduto, nomeAtualizado, precoAtualizado);
-            res.status(200).json({ message: 'Produto atualizado com sucesso!' });
+            await usuarioModel.atualizar(idUsuario, nomeAtualizado, emailAtualizado);
+            res.status(200).json({ message: 'Vendedor atualizado com sucesso!' });
 
         } catch (error) {
-            console.error('Erro ao atualizar produto:', error);
-            res.status(500).json({ erro: 'Erro interno no servidor ao atualizar produto.' });
+            console.error('Erro ao atualizar vendedor:', error);
+            res.status(500).json({ erro: 'Erro interno no servidor ao atualizar vendedor.' });
         }
 
     },
+
+    deletarVendedor: async (req, res) => {
+        try {
+            const { idUsuario } = req.params;
+            
+            if (idUsuario.length != 36) {
+                return res.status(400).json({ erros: `id do vendedor invalida!` });
+            }
+
+            const vendedor = await usuarioModel.buscarUm(idUsuario);
+
+            if (!vendedor || vendedor.length !== 1) {
+                return res.status(404).json({ erro: 'vendedor nao encontrado' });
+
+            }
+
+
+            await usuarioModel.deletar(idUsuario);
+            res.status(200).json({ message: "vendedor deletado com sucesso!" });
+
+        } catch (error) {
+            console.error('Erro ao deletar o vendedor: ', error);
+            res.status(500).json({ erro: 'Erro interno no servidor ao deletar o vendedor!' });
+
+        }
+    }
 
 };
 

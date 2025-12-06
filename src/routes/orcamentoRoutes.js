@@ -13,5 +13,8 @@ router.post('/orcamentos', orcamentoController.criarOrcamento);
 // PUT / Atualizar Orcamentos
 router.put('/orcamentos/:id', orcamentoController.atualizarOrcamento);
 
-module.exports = router;
+
+// Rota Delete para deletar orcamento 
+
+module.exports =  router;
 

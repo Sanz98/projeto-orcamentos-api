@@ -2,7 +2,7 @@ const { orcamentoModel } = require("../models/orcamentoModel")
 
 const orcamentoController = {
   
-      listarOrcamento: async (req, res) =>{
+    listarOrcamento: async (req, res) =>{
         try {
 
             const orcamento = await orcamentoModel.buscarTodos();
@@ -74,8 +74,6 @@ const orcamentoController = {
             res.status(500).json({ erro: 'Erro ao atualizar orçamento' });
         }
     }
-}
-
-
+};
 
 module.exports = {orcamentoController};
