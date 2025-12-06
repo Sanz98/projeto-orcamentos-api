@@ -1,17 +1,18 @@
-const { orcamentoModel } = require("../models/orcamentoModel")
+const { orcamentoModel } = require("../models/orcamentoModel");
+const { usuarioModel } = require("../models/usuarioModel");
 
 const orcamentoController = {
-  
-      listarOrcamento: async (req, res) =>{
+
+    listarOrcamento: async (req, res) => {
         try {
 
             const orcamento = await orcamentoModel.buscarTodos();
             res.status(200).json(orcamento);
-            
+
         } catch (error) {
-            console.error('Erro ao listar orcamentos:',error);
-            res.status(500).json({error: 'Erro ao buscar Orcamento'})
-            
+            console.error('Erro ao listar orcamentos:', error);
+            res.status(500).json({ error: 'Erro ao buscar Orcamento' })
+
         }
     },
 
@@ -20,36 +21,58 @@ const orcamentoController = {
 
     criarOrcamento: async (req, res) => {
         try {
-            const { nomeCliente, telefoneCliente, valorTotal, idVendedor } = req.body
 
-            if (nomeCliente == undefined || telefoneCliente == undefined || isNaN(valorTotal)) {
-                return res.status(400).json({
-                    erro: 'Campos obrigatorios nao preenchidos!'
-                })
+            const { idCliente, status, dataCriacao, prazoEntrega, condicaoPagamento, valorTotal, desconto, validadeDias, observacoes, idVendedor, itens
+            } = req.body;
+
+            if (idCliente == undefined || idCliente.trim() == "" || valorTotal == undefined || isNaN(valorTotal) || idVendedor == undefined || idVendedor.trim() == "") {
+                return res.status(400).json({ erro: "Campos obrigatórios não preenchidos!" });
             }
 
-            await orcamentoModel.criarOrcamento(nomeCliente, telefoneCliente, valorTotal, idVendedor)
+            if (idCliente.length != 36) {
+                return res.status(400).json({ erro: "id do cliente está inválido!" });
+            }
+
+            // VALIDAR SE O idCliente EXISTE NO DB
+
+            if (idVendedor.length != 36) {
+                return res.status(400).json({ erro: "id do vendedor está inválido!" });
+            }
+
+            const vendedor = await usuarioModel.buscarUm(idVendedor);
+
+            if (!vendedor || vendedor.length <= 0) {
+                return res.status(404).json({ erro: "vendedor não encontrado!" });
+            }
+
+            for (const item of itens) {
+                if (item.tituloAmbiente == undefined || item.tituloAmbiente.trim() == "" || item.descricaoDetalhada == undefined || item.descricaoDetalhada.trim() == "" || isNaN(item.valorUnitario) || item.valorUnitario <= 0) {
+                    return res.status(400).json({ erro: "Campos obrigatórios do item não preenchido!" });
+                }
+            }
+
+            await orcamentoModel.criarOrcamento(idCliente, status, dataCriacao, prazoEntrega, condicaoPagamento, valorTotal, desconto, validadeDias, observacoes, idVendedor, { itens });
 
             res.status(201).json({
-                message: 'orçamento criado  com sucesso!'
+                message: 'orçamento criado com sucesso!'
             })
         } catch (error) {
             console.error('Erro ao criar orçamento!:', error)
             res.status(500).json({
-                error: ('Erro ao cadastrar orçamento!', error)
+                error: 'Erro interno no servidor ao cadastrar orçamento!'
             })
         }
     },
-  
+
     atualizarOrcamento: async (req, res) => {
         try {
 
             const { id } = req.params; // Pega o ID da URL
             const { status, valorTotal } = req.body;
-            
+
             // 1. Buscar o orçamento atual para verificar como ele está
             const orcamento = await orcamentoModel.buscarPorId(id);
-            
+
             if (!orcamento) {
                 return res.status(404).json({ erro: 'Orçamento não encontrado' });
             }
@@ -78,4 +101,4 @@ const orcamentoController = {
 
 
 
-module.exports = {orcamentoController};
+module.exports = { orcamentoController };
