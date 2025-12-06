@@ -16,10 +16,10 @@ const usuarioController ={
     },
 
     criarVendedor: async (req, res) => {
-            const { nome, email, senha } = req.body;
-            const perfilFixo = 'vendedor'; // <<< FORÇA O PERFIL
-            
-            try {
+        
+        try {
+                const { nome, email, senha } = req.body;
+                const perfilFixo = 'vendedor'; // <<< FORÇA O PERFIL
                 // ... (Validações)
                 const senhaHash = await bcrypt.hash(senha, 10);
 
