@@ -1,25 +1,43 @@
-// src/routes/orcamentoRoutes.js
+// 1. Dependências Externas
 const express = require("express");
 const router = express.Router();
+
+// 2. Controllers
 const { orcamentoController } = require("../controllers/orcamentoController");
 
-// CORREÇÃO: Importar o SEU arquivo de middleware, não a biblioteca jsonwebtoken
+// 3. Middlewares (Security Layer)
 const { verify } = require("../middleware/authMiddleware");
 
-// ROTA GET: Agora protegida pelo porteiro 'verify.autenticado'
-// O fluxo é: 
-// 1. Cliente pede -> 
-// 2. verify.autenticado verifica token e coloca dados em req.usuario -> 
-// 3. orcamentoController.listarOrcamento decide o que mostrar.
+/**
+ * Rota para listar orçamentos.
+ * O retorno varia conforme o perfil do usuário (Logado no middleware).
+ * * @route GET /orcamentos
+ * @access Private (Autenticado)
+ * @middleware verify.autenticado -> Popula req.usuario
+ * @controller orcamentoController.listarOrcamento
+ */
 router.get('/orcamentos', verify.autenticado, orcamentoController.listarOrcamento);
 
-// POST e PUT também devem ser protegidos, certo?
-// Adicione o verify.autenticado neles também para garantir que quem cria/edita está logado.
+/**
+ * Rota para criar um novo orçamento.
+ * * @route POST /orcamentos
+ * @access Private (Autenticado)
+ * @middleware verify.autenticado
+ * @controller orcamentoController.criarOrcamento
+ */
 router.post('/orcamentos', verify.autenticado, orcamentoController.criarOrcamento);
+
+/**
+ * Rota para atualizar status ou valores de um orçamento.
+ * * @route PUT /orcamentos/:id
+ * @access Private (Autenticado + Regra de Negócio no Controller)
+ * @param {string} :id - ID do orçamento na URL.
+ * @middleware verify.autenticado
+ * @controller orcamentoController.atualizarOrcamento
+ */
 router.put('/orcamentos/:id', verify.autenticado, orcamentoController.atualizarOrcamento);
 
+// TODO: Implementar rota DELETE quando houver método no Controller
+// router.delete('/orcamentos/:id', verify.autenticado, orcamentoController.deletarOrcamento);
 
-// Rota Delete para deletar orcamento 
-
-module.exports =  router;
-
+module.exports = router;

@@ -1,75 +1,91 @@
+// Dependência para validação e decodificação de tokens JWT
 const jwt = require('jsonwebtoken');
 
 const verify = {
-    // Middleware para verificar se o usuário está logado (independente do perfil)
+
+    /**
+     * Middleware de Autenticação.
+     * Verifica se o usuário possui um token válido no cookie.
+     * @function autenticado
+     * @returns {void} Chama next() se o token for válido.
+     * @returns {object} 401 - Token ausente, expirado ou inválido.
+     */
     autenticado: async (req, res, next) => {
         try {
-            // 1. Tenta pegar SOMENTE do Cookie
+            // 1. Extração do Token (Cookie Strategy)
             const token = req.cookies.token;
 
-            // Se não tiver cookie, lança erro
             if (!token) {
-                throw new Error('Não autorizado. Cookie de sessão não encontrado.');
+                throw new Error('Unauthorized: Token não encontrado no cookie.');
             }
-            
-            // 2. Verifica o Token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET); 
 
-            // 3. Anexa os dados do usuário para o próximo Controller
-            // IMPORTANTE: Aqui não fazemos if/else de perfil. Apenas passamos os dados.
-            req.usuario = { 
-                idUsuario: decoded.idUsuario, 
-                perfil: decoded.perfil 
+            // 2. Verificação de Integridade e Validade
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            // 3. Payload Injection (req.usuario)
+            req.usuario = {
+                idUsuario: decoded.idUsuario,
+                perfil: decoded.perfil
             };
 
-            next(); // Permissão concedida: O usuário existe e o token é válido.
+            next();
 
         } catch (error) {
-            console.error('Erro na Autenticação:', error.message);
-            
+            console.error('Falha na Autenticação:', error.message);
+
             if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-                return res.status(401).json({ erro: 'Sessão expirada ou inválida. Refaça o login.' });
+                return res.status(401).json({ erro: 'Sessão expirada ou inválida. Faça login novamente.' });
             }
-            
-            return res.status(401).json({ erro: 'Você precisa estar logado para acessar este recurso.' });
+
+            return res.status(401).json({ erro: 'Acesso negado: Login necessário.' });
         }
     },
 
+    /**
+     * Middleware de Autorização (RBAC - Role Based Access Control).
+     * Permite acesso apenas para perfil 'gerente'.
+     * @function gerente
+     * @returns {void} Chama next() se for gerente.
+     * @returns {object} 401 - Token inválido.
+     * @returns {object} 403 - Perfil sem permissão (Forbidden).
+     */
     gerente: async (req, res, next) => {
         try {
-            // 1. Tenta pegar SOMENTE do Cookie
             const token = req.cookies.token;
 
-            // Se não tiver cookie, já lança erro
             if (!token) {
-                return res.status(401).json({erro: "Acesso não autorizado - Realize login!"});
-            }
-            
-            const decoded = jwt.verify(token, process.env.JWT_SECRET); 
-
-            // VERIFICA SE O PERFIL NO TOKEN É 'gerente'
-            if (!decoded.perfil || decoded.perfil !== 'gerente') { 
-                throw new Error('Acesso Proibido. Perfil do usuário não é gerente.');
+                return res.status(401).json({ erro: "Acesso negado: Token não fornecido." });
             }
 
-            // Anexa os dados do usuário para o próximo Controller (não essencial aqui, mas boa prática)
-            req.usuario = { idUsuario: decoded.idUsuario, perfil: decoded.perfil };
+            // Decodificação e Validação
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            next(); // PERMISSÃO CONCEDIDA!
+            // Validação de Regra de Negócio (Autorização)
+            if (!decoded.perfil || decoded.perfil !== 'gerente') {
+                throw new Error('Forbidden: Perfil insuficiente.');
+            }
+
+            req.usuario = {
+                idUsuario: decoded.idUsuario,
+                perfil: decoded.perfil
+            };
+
+            next();
 
         } catch (error) {
-            // Tratamento unificado de erros (como detalhado na resposta anterior)
-            console.error('Erro na Autorização de Gerente:', error.message);
-            
-            if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError' || error.message.includes('Token')) {
-                return res.status(401).json({ erro: 'Sessão expirada ou inválida. Refaça o login.' }); // 401 Unauthorized
-            } 
-            
-            if (error.message.includes('Acesso Proibido')) {
-                return res.status(403).json({ erro: 'Acesso Proibido. Apenas gerentes têm permissão.' }); // 403 Forbidden
+            console.error('Falha na Autorização (Gerente):', error.message);
+
+            // Caso 1: Problema no Token (401)
+            if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+                return res.status(401).json({ erro: 'Sessão inválida.' });
             }
-            
-            return res.status(500).json({ erro: 'Erro interno de autenticação.' });
+
+            // Caso 2: Problema de Permissão (403)
+            if (error.message.includes('Forbidden')) {
+                return res.status(403).json({ erro: 'Acesso restrito a gerentes.' });
+            }
+
+            return res.status(500).json({ erro: 'Erro interno na validação de credenciais.' });
         }
     }
 };

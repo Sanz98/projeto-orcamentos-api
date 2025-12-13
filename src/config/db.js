@@ -1,36 +1,42 @@
-// Importa a biblioteca para conectar ao SQL Server.
 const sql = require('mssql');
 
-// Objeto com as configurações de acesso ao banco de dados.
-const CONFIG ={
+// Configuração da conexão utilizando variáveis de ambiente para segurança
+const CONFIG = {
     user: process.env.DB_USER,
-    password:process.env.DB_PASS,
+    password: process.env.DB_PASS,
     server: process.env.DB_SERVER,
     database: process.env.DB_NAME,
-    options:{
-        encrypt: true,
-        trustServerCertificate: true //Ignora o erro de certificação autoassinado
+    options: {
+        encrypt: true, // Obrigatório para conexões seguras
+        trustServerCertificate: true // Bypass na validação SSL (apenas para ambiente de dev/local)
     }
-}
+};
 
-// Função assíncrona que estabelece e retorna um pool de conexões.
-async function getConnection(){
+/**
+ * Estabelece e retorna o pool de conexões com o SQL Server.
+ * Utiliza o padrão Singleton gerenciado pelo próprio driver 'mssql'.
+ */
+async function getConnection() {
     try {
-        // Tenta conectar ao banco usando as configurações definidas.
         const pool = await sql.connect(CONFIG);
         return pool;
     } catch (error) {
-        console.error('Erro na conexão SQL Serve:', error);
+        console.error('Falha crítica na conexão com o SQL Server:', error);
+        throw error; // Propaga o erro para ser tratado no caller ou encerrar o processo
     }
 }
 
+// Health Check: Valida a conexão imediatamente ao carregar o módulo
 (async () => {
-    const pool = await getConnection();
-
-    if (pool) {
-        console.log("Conexão o BD estabelecida com sucesso!");
+    try {
+        const pool = await getConnection();
+        if (pool) {
+            console.log("✅ Conexão com o Database estabelecida.");
+        }
+    } catch (e) {
+        console.error("❌ Erro ao tentar conectar na inicialização.", e);
     }
 })();
 
-// Exporta a função e a biblioteca para serem usadas em outras partes do projeto.
-module.exports ={sql, getConnection};
+// Exporta a instância do driver (para tipos de dados) e o gerenciador de conexão
+module.exports = { sql, getConnection };

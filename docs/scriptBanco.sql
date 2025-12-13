@@ -64,4 +64,4 @@ CREATE TABLE itensOrcamento (
     idOrcamento UNIQUEIDENTIFIER NOT NULL,
     FOREIGN KEY (idOrcamento) REFERENCES orcamentos(idOrcamento) ON DELETE CASCADE
 );
-GO
+GO  
