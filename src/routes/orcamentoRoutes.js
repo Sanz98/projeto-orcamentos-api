@@ -1,17 +1,25 @@
+// src/routes/orcamentoRoutes.js
 const express = require("express");
 const router = express.Router();
 const { orcamentoController } = require("../controllers/orcamentoController");
-const { verify } = require("jsonwebtoken");
 
-router.get('/orcamentos', orcamentoController.listarOrcamento);
+// CORREÇÃO: Importar o SEU arquivo de middleware, não a biblioteca jsonwebtoken
+const { verify } = require("../middleware/authMiddleware");
 
-// POST /Orçamento ->  criar um novo orçamento 
-router.post('/orcamentos', orcamentoController.criarOrcamento);
+// ROTA GET: Agora protegida pelo porteiro 'verify.autenticado'
+// O fluxo é: 
+// 1. Cliente pede -> 
+// 2. verify.autenticado verifica token e coloca dados em req.usuario -> 
+// 3. orcamentoController.listarOrcamento decide o que mostrar.
+router.get('/orcamentos', verify.autenticado, orcamentoController.listarOrcamento);
 
-// Rota PUT para atualizar (recebe o ID na URL)
-// Endpoint: PUT http://localhost:3000/orcamentos/:id
-// PUT / Atualizar Orcamentos
-router.put('/orcamentos/:id', orcamentoController.atualizarOrcamento);
+// POST e PUT também devem ser protegidos, certo?
+// Adicione o verify.autenticado neles também para garantir que quem cria/edita está logado.
+router.post('/orcamentos', verify.autenticado, orcamentoController.criarOrcamento);
+router.put('/orcamentos/:id', verify.autenticado, orcamentoController.atualizarOrcamento);
 
-module.exports = router;
+
+// Rota Delete para deletar orcamento 
+
+module.exports =  router;
 

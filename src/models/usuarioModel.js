@@ -105,7 +105,7 @@ const usuarioModel = {
      * @returns {Promise<void>} Não retorna valor, apenas completa a operação ou lança um erro.
      * @throws {Error} Propaga o erro caso a inserção falhe.
      */
-    inserirUsuario: async (nome, email, senhaHash, perfil) => {
+    inserir: async (nome, email, senhaHash, perfil) => {
         try {
 
             const pool = await getConnection();
@@ -126,7 +126,7 @@ const usuarioModel = {
         }
     },
 
-    atualizarUsuario: async (idUsuario, nome, email) => {
+    atualizar: async (idUsuario, nome, email) => {
         
         try {
             const pool = await getConnection();
@@ -149,6 +149,21 @@ const usuarioModel = {
         }
 
     },
+
+    deletar: async (idUsuario) => {
+        try {
+            const pool = await getConnection();
+            const querySQL = `DELETE FROM usuarios WHERE idUsuario = @idUsuario`
+
+            await pool.request()
+                .input("idUsuario", sql.UniqueIdentifier, idUsuario)
+                .query(querySQL)
+
+        } catch (error) {
+            console.error('Erro ao deletar o usuario: ', error);
+            throw error;
+        }
+    }
 };
 
 

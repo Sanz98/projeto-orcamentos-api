@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const verify = {
-        // Middleware para verificar se o usuário está logado (independente do perfil)
+    // Middleware para verificar se o usuário está logado (independente do perfil)
     autenticado: async (req, res, next) => {
         try {
             // 1. Tenta pegar SOMENTE do Cookie

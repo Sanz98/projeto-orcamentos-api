@@ -2,7 +2,7 @@
 const { sql, getConnection } = require("../config/db")
 
 const orcamentoModel = {
-    /**
+/**
  * Modelo que busca todos os produtos no banco de dados
  * 
  * @async 
@@ -31,23 +31,39 @@ const orcamentoModel = {
     buscarPorVendedor: async (idUsuario) => {
         try {
             const pool = await getConnection();
-
-            let querySQL = "SELECT * FROM orcamentos WHERE idUsuario = @idUsuario"
+            
+            // Query filtrando pelo ID do usuário logado
+            const querySQL = "SELECT * FROM orcamentos WHERE idUsuario = @idUsuario";
 
             const result = await pool.request()
-                .input('idVendedor', sql.
-                    UniqueIdentifier, idUsuario)
+                .input('idUsuario', sql.UniqueIdentifier, idUsuario) 
                 .query(querySQL);
 
             return result.recordset;
 
         } catch (error) {
-            console.error("Erro ao buscar orcamento por Vendedor:", error)
+            console.error("Erro ao buscar orcamento por Vendedor:", error);
             throw error;
-
         }
+    },
 
-
+    // Busca um orçamento específico pelo ID (para validar antes de editar)
+    buscarPorId: async (id) => {
+        try {
+            const pool = await getConnection();
+            
+            const querySQL = 'SELECT * FROM orcamentos WHERE idOrcamento = @id';
+            
+            const result = await pool.request()
+            .input('id', sql.UniqueIdentifier, id)
+            .query(querySQL);
+            
+            return result.recordset;
+            
+        } catch (error) {
+            console.error('Erro ao buscar o ID:', error);
+            throw error; // throw reverbera o erro
+        }
     },
     criarOrcamento: async (idCliente, status, dataCriacao, prazoEntrega, condicaoPagamento, valorTotal, desconto, validadeDias, observacoes, idVendedor, { itens }) => {
         const pool = await getConnection();
@@ -143,7 +159,7 @@ const orcamentoModel = {
             throw error;
         }
     }
-}
+};
 
 module.exports = {
     orcamentoModel
