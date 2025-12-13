@@ -53,13 +53,13 @@ const orcamentoModel = {
         const pool = await getConnection();
         const transaction = new sql.Transaction(pool);
 
-        transaction.begin();
+        await transaction.begin();
         try {
 
 
-            let querySQL = `INSERT  INTO orcamentos (idOrcamento, idCliente, status, dataCriacao, prazoEntrega, condicaoPagamento, valorTotal, desconto, validadeDias, observacoes, idVendedor) 
+            let querySQL = `INSERT  INTO orcamentos (idCliente, status, dataCriacao, prazoEntrega, valorTotal, desconto, validadeDias, observacoes, idVendedor) 
             OUTPUT INSERTED.idOrcamento
-            VALUES  (@idOrcamento, @idCliente, @status, @dataCriacao, @prazoEntrega, @condicaoPagamento, @valorTotal, @desconto, @validadeDias, @observacoes, @idVendedor)`;
+            VALUES  (@idCliente, @status, @dataCriacao, @prazoEntrega, @valorTotal, @desconto, @validadeDias, @observacoes, @idVendedor)`;
 
             // Inserir e retornar o Id criado (OUTPUT inserted.idOrcamento)
 
@@ -82,14 +82,14 @@ const orcamentoModel = {
 
             for (const item of itens) {
 
-                querySQL = 'INSERT INTO itemOrcamento (idItem, tituloAmbiente, descricaoDetalhada, valorUnitario, quantidade, idOrcamento) VALUES  (@idItem, @tituloAmbiente, @descricaoDetalhada, @valorUnitario, @quantidade, @idOrcamento)';
+                querySQL = 'INSERT INTO itensOrcamento (tituloAmbiente, descricaoDetalhada, valorUnitario, quantidade, idOrcamento) VALUES  (@tituloAmbiente, @descricaoDetalhada, @valorUnitario, @quantidade, @idOrcamento)';
 
                 await transaction.request()
                     .input('tituloAmbiente', sql.VarChar(100), item.tituloAmbiente)
                     .input('descricaoDetalhada', sql.VarChar(200), item.descricaoDetalhada)
                     .input('valorUnitario', sql.Decimal(10, 2), item.valorUnitario)
                     .input('quantidade', sql.Int, item.quantidade)
-                    .input('idOrcamentos', sql.UniqueIdentifier, idOrcamento)
+                    .input('idOrcamento', sql.UniqueIdentifier, idOrcamento)
                     .query(querySQL)
 
             }

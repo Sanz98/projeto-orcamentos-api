@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const SALT = 10;
 
 // EXCLUSÃO DE DADOS ANTERIORES
-(async function deleteAll() {
+async function deleteAll() {
     try {
 
         const pool = await getConnection();
@@ -26,35 +26,47 @@ const SALT = 10;
     } catch (error) {
         console.error("Erro ao deletar dados anteriores:", error);
     }
-})();
+};
 
-// CRIAÇÃO DE GERENTE
-(async function criaGerente() {
+// CRIAÇÃO DE GERENTE E VENDEDOR
+async function criaGerente() {
     try {
 
         const pool = await getConnection();
 
-        const senhaHash = bcrypt.hashSync('admin123', SALT);
+        let senhaHash = bcrypt.hashSync('admin123', SALT);
 
-        const querySQL = `INSERT INTO usuarios (nome, email, senhaHash, perfil) 
+        let querySQL = `INSERT INTO usuarios (nome, email, senhaHash, perfil) 
     OUTPUT INSERTED.nome, INSERTED.email, INSERTED.senhaHash, INSERTED.perfil
     VALUES ('Gerente Master', 'admin@email.com', @senhaHash, 'gerente')`;
 
-        const gerente = await pool.request()
+        let gerente = await pool.request()
             .input('senhaHash', sql.VarChar(255), senhaHash)
             .query(querySQL);
 
         console.log(`Criado 1 gerente:`, gerente.recordset);
+
+        senhaHash = bcrypt.hashSync('vendedor123', SALT);
+
+        querySQL = `INSERT INTO usuarios (nome, email, senhaHash, perfil) 
+    OUTPUT INSERTED.nome, INSERTED.email, INSERTED.senhaHash, INSERTED.perfil
+    VALUES ('Vendedor Master', 'vendedor@email.com', @senhaHash, 'vendedor')`;
+
+        const vendedor = await pool.request()
+            .input('senhaHash', sql.VarChar(255), senhaHash)
+            .query(querySQL);
+
+        console.log(`Criado 1 vendedor:`, vendedor.recordset);
 
         await pool.close();
 
     } catch (error) {
         console.error("Erro ao criar gerente:", error);
     }
-})();
+};
 
 // CRIAÇÃO DE CLIENTES
-(async function criaCliente() {
+async function criaCliente() {
     try {
 
         const pool = await getConnection();
@@ -73,4 +85,12 @@ const SALT = 10;
     } catch (error) {
         console.error("Erro ao criar cliente:", error);
     }
-})();
+};
+
+async function main() {
+    await deleteAll();
+    await criaGerente();
+    await criaCliente();
+}
+
+main();

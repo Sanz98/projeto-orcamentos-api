@@ -25,8 +25,8 @@ const orcamentoController = {
             const { idCliente, status, dataCriacao, prazoEntrega, condicaoPagamento, valorTotal, desconto, validadeDias, observacoes, idVendedor, itens
             } = req.body;
 
-            if (idCliente == undefined || idCliente.trim() == "" || valorTotal == undefined || isNaN(valorTotal) || idVendedor == undefined || idVendedor.trim() == "") {
-                return res.status(400).json({ erro: "Campos obrigatórios não preenchidos!" });
+            if (idCliente == undefined || idCliente.trim() == "" || valorTotal == undefined || isNaN(valorTotal) || idVendedor == undefined || idVendedor.trim() == "" || observacoes == undefined || observacoes.trim() == "") {
+                return res.status(400).json({ erro: "Campos obrigatórios do orçamento não preenchidos!" });
             }
 
             if (idCliente.length != 36) {
@@ -45,6 +45,7 @@ const orcamentoController = {
                 return res.status(404).json({ erro: "vendedor não encontrado!" });
             }
 
+            // VALIDAR o conjunto dos itens
             for (const item of itens) {
                 if (item.tituloAmbiente == undefined || item.tituloAmbiente.trim() == "" || item.descricaoDetalhada == undefined || item.descricaoDetalhada.trim() == "" || isNaN(item.valorUnitario) || item.valorUnitario <= 0) {
                     return res.status(400).json({ erro: "Campos obrigatórios do item não preenchido!" });
