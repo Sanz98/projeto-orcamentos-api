@@ -30,25 +30,25 @@ CREATE TABLE orcamentos (
     idCliente UNIQUEIDENTIFIER NOT NULL,
 
     -- Status
-    status VARCHAR(20) DEFAULT 'Em Analise' CHECK (status IN ('Em Analise', 'Aprovado', 'Rejeitado')),
-    dataCriacao DATETIME DEFAULT GETDATE(),
+    status VARCHAR(20) DEFAULT 'Em Analise' CHECK (status IN ('Em Analise', 'Aprovado', 'Rejeitado')) NOT NULL,
+    dataCriacao DATETIME DEFAULT GETDATE() NOT NULL,
     
     -- Lógica do Prazo de Entrega (60 dias padrão)
     -- DATEADD adiciona 60 dias (DAY) à data atual (GETDATE)
-    prazoEntrega DATE DEFAULT DATEADD(DAY, 60, GETDATE()), 
+    prazoEntrega DATE DEFAULT DATEADD(DAY, 60, GETDATE()) NOT NULL, 
     
     -- Lógica das Condições de Pagamento (Restrição de escolha)
-    condicoesPagamento VARCHAR(20) DEFAULT 'A combinar' CHECK (condicoesPagamento IN ('A combinar', 'A vista', 'Parcelado')),
+    condicoesPagamento VARCHAR(20) DEFAULT 'A combinar' CHECK (condicoesPagamento IN ('A combinar', 'A vista', 'Parcelado')) NOT NULL,
 
     -- Valores e Coluna Calculada
     valorTotal DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     desconto DECIMAL(10, 2) DEFAULT 0.00,
     
     -- AQUI ESTÁ O 'AS' QUE VOCÊ PERGUNTOU
-    valorFinal AS (valorTotal - desconto), 
+    valorFinal AS (valorTotal - desconto) NOT NULL, 
     
     -- Relacionamentos
-    validadeDias INT DEFAULT 7,
+    validadeDias INT DEFAULT 7 NOT NULL,
     observacoes VARCHAR(200),
     idVendedor UNIQUEIDENTIFIER NOT NULL,
     FOREIGN KEY (idVendedor) REFERENCES usuarios(idUsuario),
@@ -68,7 +68,7 @@ CREATE TABLE itensOrcamento (
     descricaoDetalhada VARCHAR(200) NOT NULL, 
     
     valorUnitario DECIMAL(10, 2) NOT NULL, --  Ex: 3540.00
-    quantidade INT DEFAULT 1, -- 
+    quantidade INT DEFAULT 1 NOT NULL, -- 
     
     -- Relacionamento: Este item pertence a qual orçamento?
     idOrcamento UNIQUEIDENTIFIER NOT NULL,
