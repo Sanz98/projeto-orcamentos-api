@@ -1,35 +1,77 @@
 USE dbMarcenaria;
 GO
 
+DROP TABLE IF EXISTS itensOrcamento;
+DROP TABLE IF EXISTS orcamentos;
+DROP TABLE IF EXISTS clientes;
+DROP TABLE IF EXISTS usuarios;
+-- 1. Tabela de Usuários (Mantive sua lógica, está ótima)
 CREATE TABLE usuarios (
     idUsuario UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
     nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE, -- Garante que não haverá emails iguais
+    email VARCHAR(100) NOT NULL UNIQUE,
     senhaHash VARCHAR(255) NOT NULL,
-    perfil VARCHAR(20) NOT NULL CHECK (perfil IN ('vendedor', 'gerente')),
+    perfil VARCHAR(20) NOT NULL CHECK (perfil IN ('vendedor', 'gerente'))
 );
 GO
 
+
+CREATE TABLE clientes(
+    idCliente UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    nomeCliente VARCHAR(100) NOT NULL,
+    telefoneCliente CHAR(12)
+);
+GO
+
+-- 2. Tabela de Orçamentos (O "Cabeçalho" do PDF)
 CREATE TABLE orcamentos (
     idOrcamento UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-    nomeCliente VARCHAR(100) NOT NULL,
-    telefoneCliente VARCHAR(20),
-    status VARCHAR(20) DEFAULT 'Em Analise' CHECK (status IN ('Em Analise', 'Aprovado', 'Rejeitado')),
-    valorTotal DECIMAL(10, 2) NOT NULL,
+    
+    idCliente UNIQUEIDENTIFIER NOT NULL,
+
+    -- Status
+    status VARCHAR(20) DEFAULT 'Em Analise' CHECK (status IN ('Em Analise', 'Aprovado', 'Rejeitado')) NOT NULL,
+    dataCriacao DATETIME DEFAULT GETDATE() NOT NULL,
+    
+    -- Lógica do Prazo de Entrega (60 dias padrão)
+    -- DATEADD adiciona 60 dias (DAY) à data atual (GETDATE)
+    prazoEntrega DATE DEFAULT DATEADD(DAY, 60, GETDATE()) NOT NULL, 
+    
+    -- Lógica das Condições de Pagamento (Restrição de escolha)
+    condicoesPagamento VARCHAR(20) DEFAULT 'A combinar' CHECK (condicoesPagamento IN ('A combinar', 'A vista', 'Parcelado')) NOT NULL,
+
+    -- Valores e Coluna Calculada
+    valorTotal DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     desconto DECIMAL(10, 2) DEFAULT 0.00,
-    valorFinal AS (valorTotal - desconto),
-    dataCriacao DATETIME DEFAULT GETDATE(),
+    
+    -- AQUI ESTÁ O 'AS' QUE VOCÊ PERGUNTOU
+    valorFinal AS (valorTotal - desconto) NOT NULL, 
+    
+    -- Relacionamentos
+    validadeDias INT DEFAULT 7 NOT NULL,
+    observacoes VARCHAR(200),
     idVendedor UNIQUEIDENTIFIER NOT NULL,
-    FOREIGN KEY (idVendedor) REFERENCES usuarios(idUsuario)
+    FOREIGN KEY (idVendedor) REFERENCES usuarios(idUsuario),
+    FOREIGN KEY (idCliente) REFERENCES clientes(idCliente)
 );
 GO
 
+-- 3. Tabela de Itens (Os Ambientes do PDF)
 CREATE TABLE itensOrcamento (
     idItem UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-    descricao VARCHAR(255) NOT NULL,
-    valorUnitario DECIMAL(10, 2) NOT NULL,
-    quantidade INT DEFAULT 1,
+    
+    -- Título do Ambiente (Ex: "COZINHA - GABINETE" )
+    tituloAmbiente VARCHAR(100) NOT NULL, 
+    
+    -- Descrição Técnica Detalhada (Mudamos para VARCHAR(MAX) para caber tudo)
+    -- Aqui vai: "SENDO ELE COM 4 GAVETAS... MATERIAIS... COR INTERNA..."
+    descricaoDetalhada VARCHAR(200) NOT NULL, 
+    
+    valorUnitario DECIMAL(10, 2) NOT NULL, --  Ex: 3540.00
+    quantidade INT DEFAULT 1 NOT NULL, -- 
+    
+    -- Relacionamento: Este item pertence a qual orçamento?
     idOrcamento UNIQUEIDENTIFIER NOT NULL,
-    FOREIGN KEY (idOrcamento) REFERENCES orcamentos(idOrcamento) ON DELETE CASCADE
+    FOREIGN KEY (idOrcamento) REFERENCES orcamentos(idOrcamento)
 );
 GO

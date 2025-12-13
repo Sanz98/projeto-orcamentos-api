@@ -1,6 +1,5 @@
 // Importa a biblioteca para conectar ao SQL Server.
 const sql = require('mssql');
-require('dotenv').config();
 
 // Objeto com as configurações de acesso ao banco de dados.
 const CONFIG ={
@@ -24,6 +23,14 @@ async function getConnection(){
         console.error('Erro na conexão SQL Serve:', error);
     }
 }
+
+(async () => {
+    const pool = await getConnection();
+
+    if (pool) {
+        console.log("Conexão o BD estabelecida com sucesso!");
+    }
+})();
 
 // Exporta a função e a biblioteca para serem usadas em outras partes do projeto.
 module.exports ={sql, getConnection};

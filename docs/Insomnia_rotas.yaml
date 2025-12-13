@@ -1,0 +1,204 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Scratch Pad
+meta:
+  id: wrk_scratchpad
+  created: 1757879644788
+  modified: 1757879644788
+  description: ""
+collection:
+  - name: Usuarios
+    meta:
+      id: fld_6ac718e338bb42a88a15a6bfbd6a10d0
+      created: 1764782758096
+      modified: 1764782758096
+      sortKey: -1764782758096
+      description: ""
+    children:
+      - url: localhost:8081/login
+        name: Login usuario
+        meta:
+          id: req_f2710c34126b4659b94e81d20d670a28
+          created: 1764782762062
+          modified: 1764783258035
+          isPrivate: false
+          description: ""
+          sortKey: -1764782762062
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "admin@marcenaria.com",
+              "senha": "admin123"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:8081/registrar/vendedor
+        name: Criar usuario
+        meta:
+          id: req_1ff97d374ab545f08d8cb285c836880b
+          created: 1764782800098
+          modified: 1764783313101
+          isPrivate: false
+          description: ""
+          sortKey: -1764782800098
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "João",
+              "email": "joao@marcenaria.com",
+              "senha": "123456789"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:8081/vendedores
+        name: Listar usuarios
+        meta:
+          id: req_adb2bf4435834573b883eb97030be876
+          created: 1764782890325
+          modified: 1764784623001
+          isPrivate: false
+          description: ""
+          sortKey: -1764782890325
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Orçamentos
+    meta:
+      id: fld_631985359fbe453183bfc01f9dde3891
+      created: 1764782854507
+      modified: 1764782854507
+      sortKey: -1764782854507
+      description: ""
+    children:
+      - url: ""
+        name: Listar orçamentos
+        meta:
+          id: req_cf7c3d1dd8334ec094d5bab984388a9a
+          created: 1764782857141
+          modified: 1764782879038
+          isPrivate: false
+          description: ""
+          sortKey: -1764782857141
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: ""
+        name: Criar orçamento
+        meta:
+          id: req_51fc8769251145eba84f02bdc74509ab
+          created: 1764782913019
+          modified: 1764782957955
+          isPrivate: false
+          description: ""
+          sortKey: -1764782913019
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: ""
+        name: Adicionar itensOrçamento
+        meta:
+          id: req_135f1a3eef8d4064bdddc36f726409d4
+          created: 1764782953510
+          modified: 1764783006731
+          isPrivate: false
+          description: ""
+          sortKey: -1764782953510
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1764782118558
+    modified: 1764783262415
+  cookies:
+    - id: 0216ef7d-48d0-4a05-ac19-9449c3f0ad73
+      key: token
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZFVzdWFyaW8iOiIzOEFFNTE3OS1GOEQ3LTRBQzEtQkRGNS0wNkRGODUxRjBCMDMiLCJub21lIjoiR2VyZW50ZSBNYXN0ZXIiLCJwZXJmaWwiOiJnZXJlbnRlIiwiaWF0IjoxNzY0NzgzMjYyLCJleHAiOjE3NjQ3ODY4NjJ9.WnMDDFuIl1YAv7h2ZV-CQRfmdiOsXeSJfPTF5F8UaWI
+      domain: localhost
+      path: /
+      secure: false
+      httpOnly: true
+      hostOnly: true
+environments:
+  name: Base Environment
+  meta:
+    id: env_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1764782118554
+    modified: 1764782118554
+    isPrivate: false

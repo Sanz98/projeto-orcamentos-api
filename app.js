@@ -1,29 +1,38 @@
+// 1. Configuração de Variáveis de Ambiente
+require('dotenv').config(); 
+
+// 2. Módulos Nativos
+const path = require('path');
+
+// 3. Módulos de Terceiros
 const express = require('express');
 const cookieParser = require('cookie-parser');
-require('dotenv').config();
-const path = require('path'); // Módulo nativo do Node.js para lidar com caminhos de arquivos
+
+// 4. Módulos Internos
 const authRoutes = require('./src/routes/authRoutes');
+const orcamentoRoutes = require('./src/routes/orcamentoRoutes');
+const usuarioRoutes = require('./src/routes/usuarioRoutes');
+
+// --- Inicialização da Aplicação ---
 const app = express();
-const PORT = process.env.PORT; // Porta onde o servidor vai rodar
+const PORT = process.env.PORT || 8081;
 
-// --- Middlewares Essenciais ---
+// --- Middlewares ---
 app.use(express.json());
+app.use(cookieParser()); // Já que importou, lembre-se de usar!
 
 
-
-// Rota raiz da API (opcional, pois o index.html já vai carregar na raiz)
-// Se você acessar http://localhost:3000/api, verá essa mensagem.
 app.get('/api', (req, res) => {
   res.send('API da Marcenaria no ar! (Acesse a raiz para ver o Front-end)');
 });
 
-// Rotas de Autenticação (ex: /login, /registrar)
-// Se usar app.use('/auth', authRoutes), a rota vira /auth/login.
-// Se usar app.use('/', authRoutes), a rota vira /login (mais simples para este MVP).
+
 app.use('/', authRoutes);
+app.use('/', usuarioRoutes);
+app.use('/', orcamentoRoutes);
 
 
-// --- Inicialização do Servidor ---
+
 app.listen(PORT,()=>{
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
