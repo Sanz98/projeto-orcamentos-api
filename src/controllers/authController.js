@@ -32,9 +32,11 @@ const authController = {
                 maxAge: Number(process.env.JWT_TIME_EXPIRES_IN)
             });
 
+            // AQUI MUDOU: Retornamos o objeto 'usuario' junto com o token
             res.status(200).json({
                 message: 'Logado com sucesso!', 
-                token
+                token,
+                usuario: payload 
             });
 
         } catch (error) {

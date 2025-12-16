@@ -1,24 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const { usuarioController } = require('../controllers/usuarioController');
-// Importe o middleware correto. Se o arquivo chama authMiddleware.js, use assim:
 const { verify } = require('../middleware/authMiddleware'); 
 
-// Rota: GET /vendedores
+// --- IMPORTANTE: Usar verify.autenticado ANTES de verify.gerente ---
 
-router.get('/vendedores', verify.gerente, usuarioController.listarVendores);
+// Rota: GET /vendedores
+router.get('/vendedores', verify.autenticado, verify.gerente, usuarioController.listarVendores);
 
 // Rota: POST /registrar/vendedor
+router.post('/registrar/vendedor', verify.autenticado, verify.gerente, usuarioController.criarVendedor);
 
-router.post('/registrar/vendedor', verify.gerente, usuarioController.criarVendedor);
+// Rota: Put /atualizar/vendedores/:idUsuario
+router.put('/atualizar/vendedores/:idUsuario', verify.autenticado, verify.gerente, usuarioController.atualizarVendedor);
 
-// Rota: Put /Vendedores
-
-router.put ('/vendedores/:idUsuario', verify.gerente,usuarioController.atualizarVendedor);
-
-//Rota: Delete/Vendedores 
-
-router.delete('/vendedores/:idUsuario', usuarioController.deletarVendedor);
-
+// Rota: Delete /deletar/vendedores/:idUsuario
+router.delete('/deletar/vendedores/:idUsuario', verify.autenticado, verify.gerente, usuarioController.deletarVendedor);
 
 module.exports = router;

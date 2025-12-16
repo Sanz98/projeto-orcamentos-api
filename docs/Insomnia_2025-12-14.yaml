@@ -1,0 +1,252 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Scratch Pad
+meta:
+  id: wrk_scratchpad
+  created: 1757879644788
+  modified: 1757879644788
+  description: ""
+collection:
+  - name: Usuarios
+    meta:
+      id: fld_6ac718e338bb42a88a15a6bfbd6a10d0
+      created: 1764782758096
+      modified: 1764782758096
+      sortKey: -1764782758096
+      description: ""
+    children:
+      - url: localhost:8081/login
+        name: Login usuario
+        meta:
+          id: req_f2710c34126b4659b94e81d20d670a28
+          created: 1764782762062
+          modified: 1765731070704
+          isPrivate: false
+          description: ""
+          sortKey: -1764782762062
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "matheus@email.com",
+              "senha": "123456789"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:8081/registrar/vendedor
+        name: Criar usuario
+        meta:
+          id: req_1ff97d374ab545f08d8cb285c836880b
+          created: 1764782800098
+          modified: 1765724479861
+          isPrivate: false
+          description: ""
+          sortKey: -1764782800098
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "Matheus",
+              "email": "matheus@email.com",
+              "senha": "123456789"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:8081/vendedores
+        name: Listar usuarios
+        meta:
+          id: req_adb2bf4435834573b883eb97030be876
+          created: 1764782890325
+          modified: 1764784623001
+          isPrivate: false
+          description: ""
+          sortKey: -1764782890325
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Orçamentos
+    meta:
+      id: fld_631985359fbe453183bfc01f9dde3891
+      created: 1764782854507
+      modified: 1764782854507
+      sortKey: -1764782854507
+      description: ""
+    children:
+      - url: localhost:8081/orcamentos
+        name: Listar orçamentos
+        meta:
+          id: req_cf7c3d1dd8334ec094d5bab984388a9a
+          created: 1764782857141
+          modified: 1765730987061
+          isPrivate: false
+          description: ""
+          sortKey: -1764782857141
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:8081/orcamentos
+        name: Criar orçamento
+        meta:
+          id: req_51fc8769251145eba84f02bdc74509ab
+          created: 1764782913019
+          modified: 1765732475554
+          isPrivate: false
+          description: ""
+          sortKey: -1764782913019
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+            	"idCliente": "94C425B0-99C0-49FD-AAA2-710835547FF9",
+            	"status": "",
+            	"dataCriacao": "",
+            	"valorTotal": 0,
+            	"desconto": 0,
+            	"validadeDias": 0,
+            	"observacoes": "Apartamento",
+            	"idVendedor": "719FEE0E-721E-49AC-A96E-156559C5A969",
+            	"itens": [
+            		{
+            			"tituloAmbiente": "Sala - Estante",
+            			"descricaoDetalhada": "Com nicho aberto",
+            			"valorUnitario": 7000,
+            			"quantidade": 0
+            		},
+            		
+            		{
+            			"tituloAmbiente": "Cozinha - gabinete",
+            			"descricaoDetalhada": "Gabinete com portas de giro e porta tempero",
+            			"valorUnitario": 4000,
+            			"quantidade": 0
+            		}
+            	]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: localhost:8081/orcamentos/23059B53-2EEB-405A-8436-7B075F3947BE/itens
+        name: "Adicionar itens "
+        meta:
+          id: req_8d0ead5690994aea8ee7ddecdb465ba4
+          created: 1765733430500
+          modified: 1765733475449
+          isPrivate: false
+          description: ""
+          sortKey: -1764782901672
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+              "tituloAmbiente": "Escritório - Mesa em L",
+              "descricaoDetalhada": "Mesa em MDF Madeirado Louro Freijó, com gaveteiro volante de 3 gavetas e passa-fios.",
+              "valorUnitario": 1850.00,
+              "quantidade": 1
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Clientes
+    meta:
+      id: fld_ccf8345f73e14d8dbda2972e12bcc615
+      created: 1765724548068
+      modified: 1765724548068
+      sortKey: -1765724548068
+      description: ""
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1764782118558
+    modified: 1765733498765
+  cookies:
+    - id: a2a5c6f8-6e98-47da-9320-41c31c30843f
+      key: token
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZFVzdWFyaW8iOiI3MTlGRUUwRS03MjFFLTQ5QUMtQTk2RS0xNTY1NTlDNUE5NjkiLCJub21lIjoiTWF0aGV1cyIsInBlcmZpbCI6InZlbmRlZG9yIiwiaWF0IjoxNzY1NzMzNDk4LCJleHAiOjE3NjU3MzcwOTh9.NXv4AeDKgRYDeCkYE8MpU-tnNqKXz3Iwtx0QLIzLgEk
+      domain: localhost
+      path: /
+      secure: false
+      httpOnly: true
+      hostOnly: true
+environments:
+  name: Base Environment
+  meta:
+    id: env_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1764782118554
+    modified: 1764782118554
+    isPrivate: false

@@ -10,7 +10,7 @@ const orcamentoController = {
 
             let orcamentos;
 
-            // 2. Lógica de Decisão (Item 4.1.3 da grade)
+            // 2. Lógica de Decisão 
             if (perfil === 'gerente') {
                 // Se for gerente, busca TUDO
                 orcamentos = await orcamentoModel.buscarTodos();
@@ -19,8 +19,8 @@ const orcamentoController = {
                 orcamentos = await orcamentoModel.buscarPorVendedor(idUsuario);
             }
 
-            const orcamento = await orcamentoModel.buscarTodos();
-            res.status(200).json(orcamento);
+
+            res.status(200).json(orcamentos);
 
         } catch (error) {
             console.error('Erro ao listar orcamentos:', error);
@@ -29,73 +29,106 @@ const orcamentoController = {
         }
     },
 
+    buscarOrcamentoPorId: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const orcamento = await orcamentoModel.buscarPorId(id);
+
+            if (!orcamento) {
+                return res.status(404).json({ erro: 'Orçamento não encontrado.' });
+            }
+
+            // Regra de Segurança
+            if (req.usuario.perfil !== 'gerente' && orcamento.idVendedor !== req.usuario.idUsuario) {
+                return res.status(403).json({ erro: 'Você não tem permissão para ver este orçamento.' });
+            }
+
+            return res.status(200).json(orcamento);
+
+        } catch (error) {
+            console.error('Erro ao buscar detalhes:', error);
+            return res.status(500).json({ erro: 'Erro interno ao buscar detalhes.' });
+        }
+    },
+
     //Função criar orçamentos 
 
 
     criarOrcamento: async (req, res) => {
         try {
+            // 1. SEGURANÇA: Pegamos o ID de quem está logado (Vem do Middleware)
+            const idVendedor = req.usuario.idUsuario;
 
-            let { idCliente, status, dataCriacao, prazoEntrega, condicaoPagamento, valorTotal, desconto, validadeDias, observacoes, idVendedor, itens
+            // 2. Extraímos o resto dos dados do Body (REMOVI o idVendedor daqui)
+            let {
+                idCliente, status, dataCriacao, prazoEntrega,
+                condicaoPagamento, desconto, validadeDias, observacoes,
+                itens
             } = req.body;
 
-            if (idCliente == undefined || idCliente.trim() == "" || valorTotal == undefined || isNaN(valorTotal) || idVendedor == undefined || idVendedor.trim() == "" || observacoes == undefined || observacoes.trim() == "") {
-                return res.status(400).json({ erro: "Campos obrigatórios do orçamento não preenchidos!" });
+            // --- Validação de Campos Básicos ---
+            // Note que não validamos mais se idVendedor veio no body, pois pegamos do token
+            if (!idCliente || !itens || itens.length === 0) {
+                return res.status(400).json({ erro: "Campos obrigatórios (Cliente, Itens) não preenchidos!" });
             }
 
-            if (dataCriacao == undefined || dataCriacao.trim() == "") {
-                dataCriacao = new Date();
+            // --- Tratamento de Defaults ---
+            if (!dataCriacao) dataCriacao = new Date();
+
+            if (!prazoEntrega) {
+                let data = new Date();
+                data.setDate(data.getDate() + 60);
+                prazoEntrega = data;
             }
 
-            if (prazoEntrega == undefined || prazoEntrega.trim() == "") {
-                prazoEntrega = new Date();
-                prazoEntrega = prazoEntrega.setDate(prazoEntrega.getDate() + 60);
-                prazoEntrega = new Date(prazoEntrega);
-            }
-
-            if (status == undefined || status.trim() == "" || (status !== 'Em Analise' && status !== 'Aprovado' && status !== 'Rejeitado')) {
+            if (!status || (status !== 'Em Analise' && status !== 'Aprovado' && status !== 'Rejeitado')) {
                 status = 'Em Analise';
             }
 
-            if (idCliente.length != 36) {
-                return res.status(400).json({ erro: "id do cliente está inválido!" });
-            }
+            // --- Lógica de Soma ---
+            let valorTotalCalculado = 0.0;
 
-            // VALIDAR SE O idCliente EXISTE NO DB
-
-            if (idVendedor.length != 36) {
-                return res.status(400).json({ erro: "id do vendedor está inválido!" });
-            }
-
-            const vendedor = await usuarioModel.buscarUm(idVendedor);
-
-            if (!vendedor || vendedor.length <= 0) {
-                return res.status(404).json({ erro: "vendedor não encontrado!" });
-            }
-
-            // VALIDAR o conjunto dos itens
             for (let item of itens) {
-                if (item.tituloAmbiente == undefined || item.tituloAmbiente.trim() == "" || item.descricaoDetalhada == undefined || item.descricaoDetalhada.trim() == "" || isNaN(item.valorUnitario) || item.valorUnitario <= 0) {
-                    return res.status(400).json({ erro: "Campos obrigatórios do item não preenchido!" });
+                if (!item.quantidade || item.quantidade <= 0) item.quantidade = 1;
+
+                if (!item.valorUnitario || item.valorUnitario < 0) {
+                    return res.status(400).json({ erro: `O item '${item.tituloAmbiente}' está sem valor unitário!` });
                 }
 
-                if (item.quantidade == undefined || item.quantidade == "" || item.quantidade <= 0) {
-                    item.quantidade = 1;
-                }
+                valorTotalCalculado += (Number(item.valorUnitario) * Number(item.quantidade));
             }
 
-            await orcamentoModel.criarOrcamento(idCliente, status, dataCriacao, prazoEntrega, condicaoPagamento, valorTotal, desconto, validadeDias, observacoes, idVendedor, { itens });
+            if (!desconto) desconto = 0.0;
+
+            // --- Validação de IDs ---
+            if (idCliente.length != 36) return res.status(400).json({ erro: "ID do cliente inválido!" });
+
+            // (Opcional) Validar se o ID do token é válido, mas o middleware já deve garantir isso.
+            if (!idVendedor || idVendedor.length != 36) return res.status(401).json({ erro: "Token inválido ou sem ID de usuário." });
+
+            // --- Persistência ---
+            await orcamentoModel.criarOrcamento(
+                idCliente, status, dataCriacao, prazoEntrega, condicaoPagamento,
+                valorTotalCalculado,
+                desconto, validadeDias, observacoes,
+                idVendedor, // <--- Usando a variável segura do Token
+                { itens }
+            );
 
             res.status(201).json({
-                message: 'orçamento criado com sucesso!'
-            })
+                message: 'Orçamento criado com sucesso!',
+                criadoPor: idVendedor, // Só para você confirmar no retorno
+                totalBruto: valorTotalCalculado,
+                totalLiquido: valorTotalCalculado - desconto
+            });
+
         } catch (error) {
-            console.error('Erro ao criar orçamento!:', error)
+            console.error('Erro ao criar orçamento:', error);
             res.status(500).json({
                 error: 'Erro interno no servidor ao cadastrar orçamento!'
-            })
+            });
         }
     },
-
     atualizarOrcamento: async (req, res) => {
         try {
 
@@ -128,7 +161,128 @@ const orcamentoController = {
             console.error(error);
             res.status(500).json({ erro: 'Erro ao atualizar orçamento' });
         }
-    }
+    },
+
+    /**
+     * Adiciona um item avulso ao orçamento existente.
+     * @route POST /orcamentos/:id/itens
+     * @param {string} req.params.id - ID do Orçamento.
+     * @param {object} req.body - Dados do Item.
+     * @returns {object} 201 - Item criado e total atualizado.
+     */
+    adicionarItem: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { tituloAmbiente, descricaoDetalhada, valorUnitario, quantidade } = req.body;
+
+            // 1. Validação de Input
+            if (!tituloAmbiente || !descricaoDetalhada || !valorUnitario) {
+                return res.status(400).json({ erro: "Campos obrigatórios do item não preenchidos!" });
+            }
+
+            // 2. Busca o orçamento para validar permissões
+            const orcamento = await orcamentoModel.buscarPorId(id);
+
+            if (!orcamento) {
+                return res.status(404).json({ erro: 'Orçamento não encontrado.' });
+            }
+
+            // Regra [RN04]: Não pode mexer se já estiver fechado
+            if (orcamento.status === 'Aprovado' || orcamento.status === 'Rejeitado') {
+                return res.status(400).json({ erro: 'Não é possível adicionar itens a um orçamento fechado.' });
+            }
+
+
+            // Regra [RN02]: Segurança de Vendedor (Só mexe no dele)
+            if (req.usuario.perfil !== 'gerente' && orcamento.idVendedor !== req.usuario.idUsuario) {
+                return res.status(403).json({ erro: 'Sem permissão para alterar este orçamento.' });
+            }
+
+            // 3. Execução
+            const novoItem = {
+                tituloAmbiente,
+                descricaoDetalhada,
+                valorUnitario,
+                quantidade: quantidade || 1
+            };
+
+            await orcamentoModel.adicionarItem(id, novoItem);
+
+            res.status(201).json({ message: 'Item adicionado com sucesso!' });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ erro: 'Erro interno ao adicionar item.' });
+        }
+    },
+
+    deletarOrcamento: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            // 1. Busca para verificar existência e permissão
+            const orcamento = await orcamentoModel.buscarPorId(id);
+
+            if (!orcamento) {
+                return res.status(404).json({ erro: 'Orçamento não encontrado.' });
+            }
+
+            // 2. Regra de Segurança: Só o dono ou gerente pode deletar
+            if (req.usuario.perfil !== 'gerente' && orcamento.idVendedor !== req.usuario.idUsuario) {
+                return res.status(403).json({ erro: 'Sem permissão para excluir este orçamento.' });
+            }
+
+            // 3. Regra de Negócio (Opcional): Não deletar orçamentos Aprovados
+            if (orcamento.status === 'Aprovado') {
+                return res.status(400).json({ erro: 'Não é permitido excluir orçamentos já aprovados.' });
+            }
+
+            await orcamentoModel.deletarOrcamento(id);
+
+            res.status(200).json({ message: 'Orçamento e itens excluídos com sucesso!' });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ erro: 'Erro interno ao excluir orçamento.' });
+        }
+    },
+
+    /**
+     * Remove um item de um orçamento.
+     * @route DELETE /orcamentos/:id/itens/:idItem
+     */
+    deletarItem: async (req, res) => {
+        try {
+            const { id, idItem } = req.params; // 'id' é do Orçamento, 'idItem' é do Item
+
+            // 1. Busca o Orçamento Pai para validar permissões (RN02 e RN04)
+            const orcamento = await orcamentoModel.buscarPorId(id);
+
+            if (!orcamento) {
+                return res.status(404).json({ erro: 'Orçamento pai não encontrado.' });
+            }
+
+            // Regra [RN04]: Não pode mexer se já estiver fechado
+            if (orcamento.status === 'Aprovado' || orcamento.status === 'Rejeitado') {
+                return res.status(400).json({ erro: 'Não é possível remover itens de um orçamento fechado.' });
+            }
+
+            // Regra [RN02]: Segurança de Vendedor
+            // Nota: Adicionei o toLowerCase() para evitar aquele erro de comparação de string
+            if (req.usuario.perfil !== 'gerente' && orcamento.idVendedor.toLowerCase() !== req.usuario.idUsuario.toLowerCase()) {
+                return res.status(403).json({ erro: 'Sem permissão para alterar este orçamento.' });
+            }
+
+            // 2. Executa a exclusão
+            await orcamentoModel.deletarItem(id, idItem);
+
+            res.status(200).json({ message: 'Item removido e valor total atualizado!' });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ erro: 'Erro interno ao deletar item.' });
+        }
+    },
 };
 
 module.exports = { orcamentoController };
