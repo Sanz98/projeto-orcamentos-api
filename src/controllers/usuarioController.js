@@ -1,14 +1,24 @@
 const { usuarioModel } = require("../models/usuarioModel");
 const bcrypt = require('bcrypt');
 
+/**
+ * Controller responsável pela gestão de usuários (Vendedores/Gerentes).
+ * Trata da segurança de dados sensíveis e regras de hierarquia.
+ */
 const usuarioController = {
 
+    /**
+     * Lista todos os usuários cadastrados, filtrando dados sensíveis.
+     * Aplica o padrão DTO (Data Transfer Object) manual para não vazar hashes de senha.
+     * @returns {Array} Lista de objetos com id, nome, email e perfil.
+     */
     listarVendores: async (req, res) => {
         try {
             const vendedores = await usuarioModel.buscarTodos();
-            
-            // ALTERAÇÃO DE SEGURANÇA: Mapeamos apenas os dados seguros
-            // O front-end não precisa (e não deve) receber a senhaHash
+
+            // 
+            // SEGURANÇA: Mapeamento (Projection) para remover a 'senhaHash'.
+            // Nunca retornamos a coluna de senha, nem mesmo criptografada, para o front-end.
             const listaSegura = vendedores.map(u => ({
                 idUsuario: u.idUsuario,
                 nome: u.nome,
@@ -23,22 +33,31 @@ const usuarioController = {
         }
     },
 
+    /**
+     * Registra um novo vendedor no sistema.
+     * Realiza o hash da senha antes de persistir no banco.
+     * @param {string} req.body.nome - Nome completo.
+     * @param {string} req.body.email - Email único.
+     * @param {string} req.body.senha - Senha em texto plano (será hashada).
+     */
     criarVendedor: async (req, res) => {
         try {
             const { nome, email, senha } = req.body;
-            const perfilFixo = 'vendedor';
+            const perfilFixo = 'vendedor'; // Por padrão, cria-se apenas vendedores aqui.
 
-            // Validação de campos
+            // Validação de entrada básica
             if (!nome || !email || !senha) {
                 return res.status(400).json({ erro: 'Preencha todos os campos.' });
             }
 
-            // Verifica se email já existe
+            // Regra de Unicidade: Verifica se o email já existe
             const usuarioExistente = await usuarioModel.buscarPorEmail(email);
             if (usuarioExistente) {
                 return res.status(409).json({ erro: 'Este e-mail já está cadastrado.' });
             }
-            
+
+            // 
+            // Criptografia: Hash com Salt (custo 10)
             const senhaHash = await bcrypt.hash(senha, 10);
 
             await usuarioModel.inserir(nome, email, senhaHash, perfilFixo);
@@ -54,14 +73,20 @@ const usuarioController = {
         }
     },
 
+    /**
+     * Atualiza dados cadastrais de um usuário.
+     * Contém regras de proteção de hierarquia (Gerente não edita outro Gerente).
+     * @param {string} req.params.idUsuario - ID do alvo da edição.
+     */
     atualizarVendedor: async (req, res) => {
         try {
             const { idUsuario } = req.params;
             const { nome, email } = req.body;
-            
-            // Pega quem está fazendo o pedido (vem do Token)
+
+            // Identificação de quem está enviando a requisição (Extraído do Token JWT)
             const perfilSolicitante = req.usuario.perfil;
 
+            // Validação de UUID
             if (idUsuario.length != 36) {
                 return res.status(400).json({ erro: 'ID do usuário inválido!' });
             }
@@ -74,14 +99,17 @@ const usuarioController = {
 
             const usuarioAlvo = usuariosEncontrados[0];
 
-            // Regra de Negócio: Gerente não altera outro Gerente (a não ser ele mesmo, mas simplificamos aqui)
+            // Regra de Negócio (Hierarquia):
+            // Protege gerentes contra alterações feitas por terceiros (mesmo outros gerentes),
+            // exceto se o gerente estiver editando seu próprio perfil.
             if (perfilSolicitante === 'gerente' && usuarioAlvo.perfil === 'gerente' && req.usuario.idUsuario !== idUsuario) {
-                return res.status(403).json({ 
-                    erro: 'Operação Negada: Gerentes não podem alterar o cadastro de outros Gerentes.' 
+                return res.status(403).json({
+                    erro: 'Operação Negada: Gerentes não podem alterar o cadastro de outros Gerentes.'
                 });
             }
 
-            // Mantém o dado antigo se não vier um novo
+            // Atualização Parcial (Patch Logic)
+            // Se 'nome' for null/undefined, mantém o 'usuarioAlvo.nome' original.
             const nomeAtualizado = nome ?? usuarioAlvo.nome;
             const emailAtualizado = email ?? usuarioAlvo.email;
 
@@ -94,15 +122,21 @@ const usuarioController = {
         }
     },
 
+    /**
+     * Remove um usuário do sistema.
+     * Impede a auto-destruição da conta logada.
+     * @param {string} req.params.idUsuario - ID do alvo da exclusão.
+     */
     deletarVendedor: async (req, res) => {
         try {
             const { idUsuario } = req.params;
-            
+
             if (idUsuario.length != 36) {
                 return res.status(400).json({ erros: `ID inválido!` });
             }
 
-            // ALTERAÇÃO DE SEGURANÇA: Impede que você delete sua própria conta
+            // Trava de Segurança: Anti-Lockout
+            // Impede que o usuário delete a si mesmo e perca acesso ao sistema.
             if (idUsuario === req.usuario.idUsuario) {
                 return res.status(400).json({ erro: 'Você não pode excluir sua própria conta aqui.' });
             }

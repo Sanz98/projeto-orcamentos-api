@@ -5,32 +5,39 @@ const { clienteController } = require('../controllers/clienteController');
 const { verify } = require('../middleware/authMiddleware');
 
 /**
- * Lista todos os clientes.
+ * @fileoverview Roteador do recurso "Clientes".
+ * Define os endpoints RESTful e aplica os middlewares de segurança necessários.
+ * Prefixo esperado: /clientes (definido no app.js)
+ */
+
+/**
+ * Recupera a lista completa de clientes.
  * @route GET /clientes
- * @access Private
+ * @middleware verify.autenticado - Exige token de login válido.
  */
 router.get('/clientes', verify.autenticado, clienteController.listarClientes);
 
 /**
- * Busca um cliente pelo ID.
+ * Recupera um único cliente baseado no ID.
  * @route GET /clientes/:id
- * @access Private
+ * @param {string} id - UUID do cliente.
+ * @middleware verify.autenticado
  */
 router.get('/clientes/:id', verify.autenticado, clienteController.buscarClientePorId);
 
 /**
- * Cria um novo cliente.
+ * Cadastra um novo cliente no sistema.
  * @route POST /clientes
- * @access Private
+ * @middleware verify.autenticado
  */
 router.post('/clientes', verify.autenticado, clienteController.criarCliente);
 
 /**
- * Atualiza um cliente existente.
+ * Atualiza os dados de um cliente existente.
  * @route PUT /clientes/:id
- * @access Private
+ * @param {string} id - UUID do cliente a ser atualizado.
+ * @middleware verify.autenticado
  */
 router.put('/clientes/:id', verify.autenticado, clienteController.atualizarCliente);
-
 
 module.exports = router;

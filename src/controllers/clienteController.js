@@ -1,7 +1,17 @@
 const { clienteModel } = require('../models/clienteModel');
 
+/**
+ * Controller responsável pelo CRUD (Create, Read, Update) de Clientes.
+ * Intermedia as requisições HTTP e a lógica de banco de dados.
+ */
 const clienteController = {
 
+    /**
+     * Retorna a lista completa de clientes cadastrados.
+     * @param {object} req - Objeto de requisição HTTP.
+     * @param {object} res - Objeto de resposta HTTP.
+     * @returns {Array} JSON com array de clientes (Status 200).
+     */
     listarClientes: async (req, res) => {
         try {
             const clientes = await clienteModel.buscarTodos();
@@ -12,10 +22,16 @@ const clienteController = {
         }
     },
 
+    /**
+     * Busca um cliente específico pelo seu ID (GUID).
+     * @param {object} req - Requisição contendo o ID nos parâmetros da URL (req.params).
+     * @returns {object} JSON com os dados do cliente (Status 200) ou erro (400/404).
+     */
     buscarClientePorId: async (req, res) => {
         try {
             const { id } = req.params;
-            
+
+            // Validação estrutural básica de um UUID (36 caracteres)
             if (id.length != 36) {
                 return res.status(400).json({ erro: 'ID inválido.' });
             }
@@ -33,17 +49,21 @@ const clienteController = {
         }
     },
 
+    /**
+     * Cadastra um novo cliente no banco de dados.
+     * @param {object} req - Body contendo { nomeCliente, telefoneCliente }.
+     * @returns {object} Mensagem de sucesso (Status 201).
+     */
     criarCliente: async (req, res) => {
         try {
             const { nomeCliente, telefoneCliente } = req.body;
 
-            // Validação simples
+            // Validação de campos obrigatórios
             if (!nomeCliente) {
                 return res.status(400).json({ erro: 'O nome do cliente é obrigatório.' });
             }
 
-            // O telefone é opcional no banco? Se for NOT NULL no banco, valide aqui.
-            // Pelo seu script é CHAR(12), então não pode ser muito longo.
+            // Validação de integridade do banco (Tamanho da coluna CHAR/VARCHAR)
             if (telefoneCliente && telefoneCliente.length > 12) {
                 return res.status(400).json({ erro: 'Telefone excede 12 caracteres.' });
             }
@@ -58,21 +78,26 @@ const clienteController = {
         }
     },
 
+    /**
+     * Atualiza os dados de um cliente existente.
+     * Implementa lógica de atualização parcial (mantém dados antigos se não enviados novos).
+     * @param {string} req.params.id - ID do cliente a ser editado.
+     */
     atualizarCliente: async (req, res) => {
         try {
             const { id } = req.params;
             const { nomeCliente, telefoneCliente } = req.body;
 
-            // 1. Valida ID
             if (id.length != 36) return res.status(400).json({ erro: 'ID inválido.' });
 
-            // 2. Busca o cliente atual
+            // Busca prévia para garantir existência e permitir merge de dados
             const clienteAtual = await clienteModel.buscarPorId(id);
             if (!clienteAtual) {
                 return res.status(404).json({ erro: 'Cliente não encontrado.' });
             }
 
-            // 3. Atualização Parcial (Mantém o antigo se não vier novo)
+            // Lógica de "Coalescência Nula" (Nullish Coalescing).
+            // Se o novo valor for null/undefined, mantém o valor que já estava no banco (clienteAtual).
             const novoNome = nomeCliente ?? clienteAtual.nomeCliente;
             const novoTelefone = telefoneCliente ?? clienteAtual.telefoneCliente;
 
