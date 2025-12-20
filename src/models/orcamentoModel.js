@@ -15,10 +15,11 @@ const orcamentoModel = {
     buscarTodos: async () => {
         try {
             const pool = await getConnection();
+            // ADICIONADO: C.telefoneCliente
             const querySQL = `
                 SELECT 
                     O.idOrcamento, O.idCliente, O.status, O.valorTotal, O.dataCriacao, O.prazoEntrega, O.idVendedor,
-                    C.nomeCliente, 
+                    C.nomeCliente, C.telefoneCliente,
                     IO.idItem, IO.tituloAmbiente, IO.descricaoDetalhada, IO.valorUnitario, IO.quantidade
                 FROM orcamentos O
                 INNER JOIN clientes C ON O.idCliente = C.idCliente 
@@ -39,10 +40,11 @@ const orcamentoModel = {
     buscarPorVendedor: async (idUsuario) => {
         try {
             const pool = await getConnection();
+            // ADICIONADO: C.telefoneCliente
             const querySQL = `
                 SELECT 
                     O.idOrcamento, O.idCliente, O.status, O.valorTotal, O.dataCriacao, O.prazoEntrega, O.idVendedor,
-                    C.nomeCliente, 
+                    C.nomeCliente, C.telefoneCliente,
                     IO.idItem, IO.tituloAmbiente, IO.descricaoDetalhada, IO.valorUnitario, IO.quantidade
                 FROM orcamentos O
                 INNER JOIN clientes C ON O.idCliente = C.idCliente 
@@ -67,10 +69,11 @@ const orcamentoModel = {
         try {
             const pool = await getConnection();
             
+            // ADICIONADO: C.telefoneCliente
             const querySQL = `
                 SELECT 
-                    O.idOrcamento, O.idCliente, O.status, O.valorTotal, O.dataCriacao, O.prazoEntrega, O.idVendedor,
-                    C.nomeCliente,
+                    O.idOrcamento, O.idCliente, O.status, O.valorTotal, O.dataCriacao, O.prazoEntrega, O.idVendedor, O.observacoes,
+                    C.nomeCliente, C.telefoneCliente,
                     IO.idItem, IO.tituloAmbiente, IO.descricaoDetalhada, IO.valorUnitario, IO.quantidade
                 FROM orcamentos O
                 INNER JOIN clientes C ON O.idCliente = C.idCliente
@@ -252,11 +255,13 @@ const orcamentoModel = {
                     idOrcamento: linha.idOrcamento,
                     idCliente: linha.idCliente,
                     nomeCliente: linha.nomeCliente,
+                    telefoneCliente: linha.telefoneCliente, // <--- ADICIONADO AQUI TAMBÉM
                     idVendedor: linha.idVendedor,
                     status: linha.status,
                     dataCriacao: linha.dataCriacao,
                     prazoEntrega: linha.prazoEntrega,
                     valorTotal: linha.valorTotal,
+                    observacoes: linha.observacoes, // <--- Adicionado observacoes que estava faltando no objeto final
                     itens: [] // Inicia array vazio
                 });
             }
